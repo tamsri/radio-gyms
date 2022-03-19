@@ -1,0 +1,1 @@
+from .obj_reader import ObjToTriangles
