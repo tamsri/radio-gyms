@@ -4,6 +4,7 @@ import numpy as np
 
 from radio_gyms.engines import Tracer
 from radio_gyms.engines.ray_tracer.triangle import Triangle
+from radio_gyms.engines.ray_tracer.box import Box
 from numpy.typing import NDArray
 
 POZNAN_OBJ_PATH = os.path.join("..", "assets", "models", )
@@ -14,13 +15,35 @@ class TestTracer(unittest.TestCase):
         a:NDArray = np.array([5,0,-3])
         b:NDArray = np.array([-5,0,-2])
         c:NDArray = np.array([0,-4,4])
-        test_triangle = Triangle((a, b, c))
+        test_triangle = Triangle(a, b, c)
 
         ray_pos = np.array([0, 0 ,0])
         ray_dir = np.array([0, -10, 0])
         ray = (ray_pos, ray_dir)
+
         result = test_triangle.isIntersect(ray)
         self.assertNotEqual(result, -1)
+
+    def test_box(self):
+        a: NDArray = np.array([5, 0, -3])
+        b: NDArray = np.array([-5, 0, -2])
+        c: NDArray = np.array([0, -4, 4])
+        test_triangle = Triangle(a, b, c)
+        box = Box([test_triangle])
+
+        ray_pos = np.array([0, 0, 0])
+        ray_dir = np.array([0, -1, 0])
+        ray = (ray_pos, ray_dir)
+        result = box.is_intersect(ray)
+        self.assertEqual(result, True)
+
+        print(box.min_bound)
+        print(box.max_bound)
+        ray_pos2 = np.array([0, 10, 0])
+        ray_dir2 = np.array([0, 1, 0])
+        ray2 = (ray_pos2, ray_dir2)
+        result2 = box.is_intersect(ray2)
+        self.assertEqual(result2, False)
 
     def test_tracer(self):
         tracer = Tracer(POZNAN_OBJ_PATH)

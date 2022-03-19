@@ -5,12 +5,11 @@ from .box import Box
 
 class BVH:
     root: Box = None
-
     def __init__(self, triangles: Sequence[Triangle]):
         self.root = Box(triangles)
         BVH.makeChildren(self.root, 0)
 
-    def isIntersect(self, ray):
+    def is_intersect(self, ray):
         return -1
 
     @staticmethod

@@ -12,10 +12,10 @@ class Triangle:
     edgeA: NDArray = None
     edgeB: NDArray = None
 
-    def __init__(self, triangle: Tuple[NDArray, NDArray, NDArray]):
-        self.pointA = triangle[0]
-        self.pointB = triangle[1]
-        self.pointC = triangle[2]
+    def __init__(self, a: NDArray, b: NDArray, c:NDArray):
+        self.pointA = a
+        self.pointB = b
+        self.pointC = c
         self.edgeA = self.pointB - self.pointA
         self.edgeB = self.pointC - self.pointA
         self.normal = np.cross(self.edgeA, self.edgeB)
@@ -26,7 +26,7 @@ class Triangle:
         ray_dir = ray[1]
         h = np.cross(ray_dir, self.edgeB)
         a = np.dot(self.edgeA, h)
-        if a > -EPSILON and a < EPSILON:
+        if -EPSILON < a < EPSILON:
             return -1
         f = 1.0 / float(a)
         s = ray_pos - self.pointA
