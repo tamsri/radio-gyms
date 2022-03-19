@@ -1,9 +1,14 @@
+from typing import Sequence
+from .triangle import Triangle
+
 from .box import Box
 
 class BVH:
-    def __init__(self, triangles):
+    root: Box = None
+
+    def __init__(self, triangles: Sequence[Triangle]):
         self.root = Box(triangles)
-        BVH.makeChildren(self.root, 0);
+        BVH.makeChildren(self.root, 0)
 
     def isIntersect(self, ray):
         return -1
