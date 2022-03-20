@@ -8,7 +8,6 @@ from .box import Box
 
 class BVH:
     root: Box = None
-
     def __init__(self, triangles: Sequence[Triangle]):
         self.root = Box(triangles)
         BVH.make_children(self.root, 0)

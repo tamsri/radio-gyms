@@ -61,5 +61,6 @@ class TestTracer(unittest.TestCase):
     def test_tracer_reflect(self):
         tracer = Tracer(POZNAN_OBJ_PATH)
         tx_pos = np.array([0, 15, 0])
-        rx_pos = np.array([-30, 1.5, 45])
+        rx_pos = np.array([1, 1.5, 1])
         result = tracer.trace_outdoor(tx_pos, rx_pos)
+        print(result)
