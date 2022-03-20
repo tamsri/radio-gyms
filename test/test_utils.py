@@ -6,5 +6,4 @@ from unittest import TestCase
 class TestUtils(TestCase):
 
     def test_objreader(self):
-        print(os.getcwd())
         pass

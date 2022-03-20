@@ -1,6 +1,9 @@
 import numpy as np
+
 from typing import Tuple
 from numpy.typing import NDArray
+
+from ...utils.calculations import normalize as VecNorm
 from ...utils.constants import EPSILON
 
 
@@ -19,14 +22,12 @@ class Triangle:
         self.edgeA = self.pointB - self.pointA
         self.edgeB = self.pointC - self.pointA
         self.normal = np.cross(self.edgeA, self.edgeB)
-        
-        norm = np.linalg.norm(self.normal)
-        if norm != 0:
-            self.normal = self.normal/norm
+        self.normal = VecNorm(self.normal)
             
-    def isIntersect(self, ray: Tuple[NDArray, NDArray]) -> float:
-        ray_pos = ray[0]
-        ray_dir = ray[1]
+    def is_intersect(self, ray: Tuple[NDArray, NDArray]) -> float:
+        ray_pos: NDArray = ray[0]
+        ray_dir: NDArray = ray[1]
+
         h = np.cross(ray_dir, self.edgeB)
         a = np.dot(self.edgeA, h)
         if -EPSILON < a < EPSILON:

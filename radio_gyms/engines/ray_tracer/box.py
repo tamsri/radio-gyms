@@ -8,26 +8,25 @@ from ...utils.constants import MAX_FLT, MIN_FLT
 class Box:
     min_bound: NDArray = None
     max_bound: NDArray = None
-    triangles: List[Triangle] = None
+    triangles: List[Triangle] = []
     child_left: 'Box' = None
     child_right: 'Box' = None
     alone: bool = False
 
     def __init__(self, triangles: List[Triangle]):
         self.triangles = triangles
-        if len(triangles) == 1:
-            alone = True
+        if len(self.triangles) == 1:
+            self.alone = True
         min_x, min_y, min_z = MAX_FLT, MAX_FLT, MAX_FLT
-        max_x, max_y, max_z = MIN_FLT, MIN_FLT, MAX_FLT
+        max_x, max_y, max_z = MIN_FLT, MIN_FLT, MIN_FLT
 
         for triangle in self.triangles:
             x_list = [triangle.pointA[0], triangle.pointB[0], triangle.pointC[0]]
             y_list = [triangle.pointA[1], triangle.pointB[1], triangle.pointC[1]]
             z_list = [triangle.pointA[2], triangle.pointB[2], triangle.pointC[2]]
-            min_x, max_x = min(x_list), max(x_list)
-            min_y, max_y = min(y_list), max(y_list)
-            min_z, max_z = min(z_list), max(z_list)
-
+            min_x, max_x = min(x_list + [min_x]), max(x_list + [max_x])
+            min_y, max_y = min(y_list + [min_y]), max(y_list + [max_y])
+            min_z, max_z = min(z_list + [min_z]), max(z_list + [max_z])
         self.min_bound = np.array([min_x, min_y, min_z])
         self.max_bound = np.array([max_x, max_y, max_z])
 
