@@ -7,7 +7,7 @@ from radio_gyms.engines.ray_tracer.triangle import Triangle
 from radio_gyms.engines.ray_tracer.box import Box
 from numpy.typing import NDArray
 
-POZNAN_OBJ_PATH = os.path.join("..", "assets", "models", )
+POZNAN_OBJ_PATH = os.path.join(os.getcwd(), ".." , "assets", "models", "poznan.obj")
 
 class TestTracer(unittest.TestCase):
 
@@ -37,8 +37,6 @@ class TestTracer(unittest.TestCase):
         result = box.is_intersect(ray)
         self.assertEqual(result, True)
 
-        print(box.min_bound)
-        print(box.max_bound)
         ray_pos2 = np.array([0, 10, 0])
         ray_dir2 = np.array([0, 1, 0])
         ray2 = (ray_pos2, ray_dir2)

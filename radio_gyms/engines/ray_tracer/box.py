@@ -1,4 +1,4 @@
-from typing import Sequence, Tuple
+from typing import Sequence, Tuple, List
 import numpy as np
 from numpy.typing import NDArray
 from .triangle import Triangle
@@ -8,12 +8,15 @@ from ...utils.constants import MAX_FLT, MIN_FLT
 class Box:
     min_bound: NDArray = None
     max_bound: NDArray = None
-    triangles: Sequence[Triangle] = None
+    triangles: List[Triangle] = None
     child_left: 'Box' = None
     child_right: 'Box' = None
+    alone: bool = False
 
-    def __init__(self, triangles: Sequence[Triangle]):
+    def __init__(self, triangles: List[Triangle]):
         self.triangles = triangles
+        if len(triangles) == 1:
+            alone = True
         min_x, min_y, min_z = MAX_FLT, MAX_FLT, MAX_FLT
         max_x, max_y, max_z = MIN_FLT, MIN_FLT, MAX_FLT
 
@@ -31,10 +34,11 @@ class Box:
     def is_intersect(self, ray: Tuple[NDArray, NDArray]) -> bool:
         """
         check if the input ray intersects with the box
-        Algorithm: "fast branchless raybounding box intersection"
+
         :param ray:
         :return: true/false
         """
+        # Optimized from the algorithm: "fast branchless raybounding box intersection"
         ray_pos: NDArray = ray[0]
         ray_dir: NDArray = ray[1]
         min_bound_check = (self.min_bound - ray_pos) * ray_dir

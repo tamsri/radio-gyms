@@ -19,8 +19,11 @@ class Triangle:
         self.edgeA = self.pointB - self.pointA
         self.edgeB = self.pointC - self.pointA
         self.normal = np.cross(self.edgeA, self.edgeB)
-        self.normal = self.normal / np.sqrt(np.sum(self.normal ** 2))
-
+        
+        norm = np.linalg.norm(self.normal)
+        if norm != 0:
+            self.normal = self.normal/norm
+            
     def isIntersect(self, ray: Tuple[NDArray, NDArray]) -> float:
         ray_pos = ray[0]
         ray_dir = ray[1]
