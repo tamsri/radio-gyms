@@ -63,5 +63,4 @@ class TestTracer(unittest.TestCase):
         tx_pos = np.array([0, 15, 0])
         rx_pos = np.array([-30, 1.5, 45])
         result = tracer.find_edge(tx_pos, rx_pos)
-        print(result)
-        self.assertEqual(len(result), 1)
+        self.assertEqual(len(result), 3)
