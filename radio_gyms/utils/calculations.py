@@ -1,5 +1,6 @@
 import numpy as np
 from numpy.typing import NDArray
+from .constants import EPSILON
 
 
 def normalize(vector: NDArray) -> NDArray:
@@ -22,3 +23,10 @@ def vector_angle(a_dir: NDArray, b_dir: NDArray) -> float:
 
 def position_between_xz(min_x, max_x, min_z, max_z, pos) -> bool:
     return min_x <= pos[0] <= max_x and min_z <= pos[2] <= max_z
+
+
+def vector_inverse(vector: NDArray) -> NDArray:
+    for i in range(3):
+        if vector[i] == 0:
+            vector[i] = EPSILON
+    return 1 / vector

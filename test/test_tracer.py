@@ -62,5 +62,11 @@ class TestTracer(unittest.TestCase):
         tracer = Tracer(POZNAN_OBJ_PATH)
         tx_pos = np.array([0, 15, 0])
         rx_pos = np.array([-30, 1.5, 45])
-        result = tracer.find_edge(tx_pos, rx_pos)
-        self.assertEqual(len(result), 3)
+        result = tracer.trace_single_reflect(tx_pos, rx_pos)
+        self.assertEqual(len(result), 2)
+
+    def test_roof_difftract(self):
+        tracer = Tracer(POZNAN_OBJ_PATH)
+        tx_pos = np.array([0, 15, 0])
+        rx_pos = np.array([-30, 1.5, 45])
+        result = tracer.trace_roof_edges(tx_pos, rx_pos)

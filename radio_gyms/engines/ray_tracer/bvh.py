@@ -8,6 +8,7 @@ from .box import Box
 
 class BVH:
     root: Box = None
+
     def __init__(self, triangles: Sequence[Triangle]):
         self.root = Box(triangles)
         BVH.make_children(self.root, 0)
@@ -20,9 +21,6 @@ class BVH:
         while len(hot_boxes) != 0:
             current_box = hot_boxes.pop(0)
 
-            if not current_box.is_intersect(ray):
-                continue
-
             if current_box.alone:
                 current_hit = current_box.triangles[0].is_intersect(ray)
                 if current_hit > 0:
@@ -30,6 +28,8 @@ class BVH:
                     hit_once = True
                 continue
 
+            if not current_box.is_intersect(ray):
+                continue
             if current_box.child_left is not None:
                 hot_boxes.append(current_box.child_left)
             if current_box.child_right is not None:
@@ -40,28 +40,30 @@ class BVH:
         return -1
 
     @staticmethod
-    def make_children(root: Box, level: int):
+    def make_children(parent: Box, level: int):
         k: int = level % 3
+        ordered_triangles = []
         if k == 0:
-            root.triangles.sort(key=lambda tri: min([tri.pointA[0], tri.pointB[0], tri.pointC[0]]))
+            ordered_triangles = sorted(parent.triangles, key=lambda tri: tri.max_x, reverse=False)
         elif k == 1:
-            root.triangles.sort(key=lambda tri: min([tri.pointA[1], tri.pointB[1], tri.pointC[1]]))
+            ordered_triangles = sorted(parent.triangles, key=lambda tri: tri.max_y, reverse=False)
         elif k == 2:
-            root.triangles.sort(key=lambda tri: min([tri.pointA[2], tri.pointB[2], tri.pointC[2]]))
+            ordered_triangles = sorted(parent.triangles, key=lambda tri: tri.max_z, reverse=False)
 
-        middle_index = int(len(root.triangles) / 2)
-        left_triangles = root.triangles[:middle_index]
-        right_triangles = root.triangles[middle_index:]
+        middle_index = int(len(ordered_triangles) / 2)
+        left_triangles = ordered_triangles[:middle_index]
+        right_triangles = ordered_triangles[middle_index:]
 
         n_left = len(left_triangles)
         n_right = len(right_triangles)
 
         level += 1
         if n_left != 0:
-            root.child_left = Box(left_triangles)
+            parent.child_left = Box(left_triangles)
             if n_left > 1:
-                BVH.make_children(root.child_left, level)
+                BVH.make_children(parent.child_left, level)
         if n_right != 0:
-            root.child_right = Box(right_triangles)
+            parent.child_right = Box(right_triangles)
             if n_right > 1:
-                BVH.make_children(root.child_right, level)
+                BVH.make_children(parent.child_right, level)
+

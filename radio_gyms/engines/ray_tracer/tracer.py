@@ -4,7 +4,7 @@ from numpy.typing import NDArray
 import numpy as np
 
 from ...utils import ObjToTriangles, VecNorm, VecDistance, VecAngle, PosBetweenXZ
-from ...utils.constants import EPSILON, MIN_ROOF_EDGE_DISTANCE, ROOF_MIN_ANGLE, ROOF_MAX_SCAN
+from ...utils.constants import EPSILON, MIN_ROOF_EDGE_DISTANCE, ROOF_MIN_ANGLE, ROOF_MAX_SCAN, MAX_FLT
 from .bvh import BVH
 
 
@@ -72,7 +72,7 @@ class Tracer:
         t = (b - c) / d
         return pos + normal * 2 * t
 
-    def trace_reflections(self, tx_pos, rx_pos) -> Dict:
+    def trace_reflections(self, tx_pos: NDArray, rx_pos: NDArray) -> Dict:
         """
         Trace Reflection Points
         :param tx_pos: Transmitting Position
