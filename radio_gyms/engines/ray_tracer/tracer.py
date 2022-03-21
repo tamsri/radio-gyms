@@ -3,8 +3,8 @@ from numpy.typing import NDArray
 
 import numpy as np
 
-from ...utils import ObjToTriangles, VecNorm, VecDistance
-from ...utils.constants import EPSILON
+from ...utils import ObjToTriangles, VecNorm, VecDistance, VecAngle, PosBetweenXZ
+from ...utils.constants import EPSILON, MIN_ROOF_EDGE_DISTANCE, ROOF_MIN_ANGLE, ROOF_MAX_SCAN
 from .bvh import BVH
 
 
@@ -64,7 +64,12 @@ class Tracer:
     @staticmethod
     def get_mirror_point(pos: NDArray, triangle: 'Triangle') -> NDArray:
         normal = triangle.normal
-        t = (np.dot(normal, triangle.pointB) - np.dot(pos, normal)) / np.dot(normal, normal)
+        b = np.dot(normal, triangle.pointB)
+        c = np.dot(pos, normal)
+        d = np.dot(normal, normal)
+        if d == 0:
+            d = EPSILON
+        t = (b - c) / d
         return pos + normal * 2 * t
 
     def trace_reflections(self, tx_pos, rx_pos) -> Dict:
@@ -75,7 +80,8 @@ class Tracer:
         :return: reflection points
         """
         reflections = {'single': self.trace_single_reflect(tx_pos, rx_pos),
-                       'double': self.trace_double_reflect(tx_pos, rx_pos)}
+                       # 'double': self.trace_double_reflect(tx_pos, rx_pos)
+                       }
         return reflections
 
     def trace_single_reflect(self, tx_pos, rx_pos) -> List[NDArray]:
@@ -88,7 +94,8 @@ class Tracer:
             if mirror_to_rx_dist < 0:
                 continue
             point_on_triangle = mirror_point + dir_mirror_to_rx * (mirror_to_rx_dist + EPSILON)
-            if self.direct_path(tx_pos, point_on_triangle) and self.direct_path(rx_pos, point_on_triangle):
+            if self.direct_path(tx_pos, point_on_triangle) and \
+                    self.direct_path(rx_pos, point_on_triangle):
                 single_reflections.append(point_on_triangle)
         return single_reflections
 
@@ -121,9 +128,9 @@ class Tracer:
                 if tx_mirror_to_rx_mirror_dist < 0 or rx_mirror_to_tx_mirror_dist < 0:
                     continue
                 tx_point_on_triangle = tx_mirror_point + tx_mirror_to_rx_mirror_dir * (
-                            tx_mirror_to_rx_mirror_dist + EPSILON)
+                        tx_mirror_to_rx_mirror_dist + EPSILON)
                 rx_point_on_triangle = rx_mirror_point + rx_mirror_to_tx_mirror_dir * (
-                            rx_mirror_to_tx_mirror_dist + EPSILON)
+                        rx_mirror_to_tx_mirror_dist + EPSILON)
 
                 if self.direct_path(tx_pos, tx_point_on_triangle) and \
                         self.direct_path(tx_point_on_triangle, rx_point_on_triangle) and \
@@ -131,11 +138,80 @@ class Tracer:
                     double_reflections.append([tx_point_on_triangle, rx_point_on_triangle])
         return double_reflections
 
-    def trace_roof_edges(self, tx_pos, rx_pos):
+    def trace_roof_edges(self, tx_pos, rx_pos) -> List:
         """
         Trace Knife Edges
         :param tx_pos: Transmitting Position
         :param rx_pos: Receiving Position
         :return: Knife Edges
         """
+        edges = []
+        left_pos = tx_pos
+        right_pos = rx_pos
+
+        current_scan = 0
+
+        while not self.direct_path(left_pos, right_pos):
+            if current_scan > ROOF_MAX_SCAN:
+                return edges
+            edge_left = self.find_edge(left_pos, right_pos)
+            if edge_left is None:
+                return []
+            edge_right = self.find_edge(right_pos, left_pos)
+            if edge_right is None:
+                return []
+
+            if self.direct_path(edge_left, edge_right):
+                if VecDistance(edge_left, edge_right) < MIN_ROOF_EDGE_DISTANCE:
+                    avg_edge = (edge_left+edge_right)/2
+                    edges.append(avg_edge)
+                    return edges
+                edges.append(edge_left)
+                edges.append(edge_right)
+                return edges
+
+            edges.append(edge_left)
+            edges.append(edge_right)
+            left_pos = edge_left
+            right_pos = edge_right
         return []
+
+    def find_edge(self, left_pos, right_pos):
+        max_scan = 20
+        min_angle = 0.0017
+        min_x = min(left_pos[0], right_pos[0])
+        max_x = max(left_pos[0], right_pos[0])
+        min_z = min(left_pos[2], right_pos[2])
+        max_z = max(left_pos[2], right_pos[2])
+
+        top_direction = np.array([0, 1, 0])
+        upper_ray = (left_pos, top_direction)
+        if self.map.is_intersect(upper_ray) > 0:
+            return None
+        lower_ray = (left_pos, VecNorm(right_pos - left_pos))
+
+        current_scan = 0
+
+        while current_scan < max_scan and\
+                VecAngle(upper_ray[1], lower_ray[1]) > min_angle:
+
+            new_dir = (upper_ray[1] + lower_ray[1]) / 2
+            check_ray = (left_pos, new_dir)
+
+            hit_nearest = self.map.is_intersect(check_ray)
+            if hit_nearest > 0 and PosBetweenXZ(min_x, max_x, min_z, max_z, left_pos + new_dir * hit_nearest):
+                lower_ray = check_ray
+            else:
+                upper_ray = check_ray
+
+            left_pos_on_plane = np.array([left_pos[0], 0, left_pos[2]])
+            right_pos_on_plane = np.array([right_pos[0], 0, right_pos[2]])
+            plane_dir = VecNorm(right_pos_on_plane - left_pos_on_plane)
+            theta = VecAngle(plane_dir, lower_ray[1])
+            x_angle = VecAngle(lower_ray[1], upper_ray[1])
+            height = hit_nearest * np.cos(theta) * np.tan(theta + x_angle)
+            width = hit_nearest * np.cos(theta)
+            edge_distance = np.sqrt(height ** 2 + width ** 2)
+            edge_pos = upper_ray[0] + upper_ray[1] * edge_distance
+            return edge_pos
+        return None
