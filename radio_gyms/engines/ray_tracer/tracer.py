@@ -3,7 +3,7 @@ from numpy.typing import NDArray
 
 import numpy as np
 
-from ...utils import ObjToTriangles, VecNorm, VecDistance, VecAngle, PosBetweenXZ
+from ...utils import ObjToTriangles, VecNorm, VecDistance, VecAngle, PosBetweenXZ, SortPointsFromPlaneY
 from ...utils.constants import EPSILON, MIN_ROOF_EDGE_DISTANCE, ROOF_MIN_ANGLE, ROOF_MAX_SCAN, MAX_FLT
 from ...utils import VecNorm
 from .bvh import BVH
@@ -36,7 +36,8 @@ class Tracer:
             result["direct"] = True
         else:
             result["direct"] = False
-            result["roof_edges"] = self.trace_roof_edges(tx_pos, rx_pos)
+            sorted_edges = SortPointsFromPlaneY(tx_pos, self.trace_roof_edges(tx_pos, rx_pos))
+            result["roof_edges"] = sorted_edges
 
         result['reflections'] = self.trace_reflections(tx_pos, rx_pos)
         return result
@@ -80,9 +81,10 @@ class Tracer:
         :param rx_pos: Receiving Position
         :return: reflection points
         """
-        reflections = {'single': self.trace_single_reflect(tx_pos, rx_pos),
-                       'double': self.trace_double_reflect(tx_pos, rx_pos)
-                       }
+        reflections = {
+            'single': self.trace_single_reflect(tx_pos, rx_pos),
+            'double': self.trace_double_reflect(tx_pos, rx_pos)
+        }
         return reflections
 
     def trace_single_reflect(self, tx_pos, rx_pos) -> List[NDArray]:
@@ -164,7 +166,7 @@ class Tracer:
 
             if self.direct_path(edge_left, edge_right):
                 if VecDistance(edge_left, edge_right) < MIN_ROOF_EDGE_DISTANCE:
-                    avg_edge = (edge_left+edge_right)/2
+                    avg_edge = (edge_left + edge_right) / 2
                     edges.append(avg_edge)
                     return edges
                 edges.append(edge_left)
@@ -190,7 +192,7 @@ class Tracer:
         lower_ray = (left_pos, VecNorm(right_pos - left_pos))
 
         current_scan = 0
-        while current_scan < ROOF_MAX_SCAN and\
+        while current_scan < ROOF_MAX_SCAN and \
                 VecAngle(upper_ray[1], lower_ray[1]) > ROOF_MIN_ANGLE:
             current_scan += 1
 
@@ -198,7 +200,7 @@ class Tracer:
             check_ray = (left_pos, new_dir)
 
             hit_nearest = self.map.is_intersect(check_ray)
-            if hit_nearest > 0 and  PosBetweenXZ(min_x, max_x, min_z, max_z,  left_pos + new_dir * hit_nearest):
+            if hit_nearest > 0 and PosBetweenXZ(min_x, max_x, min_z, max_z, left_pos + new_dir * hit_nearest):
                 lower_ray = check_ray
             else:
                 upper_ray = check_ray
@@ -224,4 +226,3 @@ class Tracer:
         sky_pos = np.copy(pos)
         sky_pos[1] = 1000
         return self.direct_path(pos, sky_pos)
-

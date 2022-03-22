@@ -3,6 +3,7 @@ requires = [
     "setuptools>=42",
     "wheel",
     "numpy",
-    "pandas"
+    "pandas",
+    "pywavefront"
 ]
 build-backend = "setuptools.build_meta"

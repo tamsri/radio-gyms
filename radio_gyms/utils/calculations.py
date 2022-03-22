@@ -1,4 +1,5 @@
 import numpy as np
+from typing import List
 from numpy.typing import NDArray
 from .constants import EPSILON
 
@@ -26,8 +27,19 @@ def position_between_xz(min_x, max_x, min_z, max_z, pos) -> bool:
 
 
 def vector_inverse(vector: NDArray) -> NDArray:
-    inv_vec = np.copy(vector).astype('float64')
+    inv_vec = np.copy(vector).astype('float32')
     for i in range(len(vector)):
         if inv_vec[i] == 0:
             inv_vec[i] = EPSILON
-    return 1.0/inv_vec
+    return 1.0 / inv_vec
+
+
+def plane_y_distance(pos_a: NDArray, pos_b: NDArray):
+    a_on_plane, b_on_plane = np.copy(pos_a), np.copy(pos_b)
+    a_on_plane[1], b_on_plane[1] = 0.0, 0.0
+    return point_distance(a_on_plane, b_on_plane)
+
+
+def sort_nearest_points_from_on_plane_y(ref_pos: NDArray, points: List[NDArray]) -> List[NDArray]:
+    sorted_points = sorted(points, key=lambda point: plane_y_distance(point, ref_pos))
+    return sorted_points

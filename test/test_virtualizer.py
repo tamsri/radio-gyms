@@ -14,7 +14,7 @@ class TestVirtualizer(TestCase):
         tracer = Tracer(POZNAN_OBJ_PATH)
         tx_pos = np.array([0, 5, 0])
         lines = []
-        for i in range(1):
+        for i in range(20):
             while True:
                 rx_pos = (np.random.rand(3)*2-1)*100
                 rx_pos[1] = 1.2

@@ -12,7 +12,7 @@ pip install radio_gyms
 
 ## Documentation
 Radio Gyms provides radio propagation engines and tools for customizations.
-The documentation can be found at ***[radio-gyms.intelek.ai](https://radio-gyms.intelek.ai)***
+The official documentation can be found at ***[radio-gyms.intelek.ai](https://radio-gyms.intelek.ai)***
 
 ## Contributors
 - [Supawat Tamsri](https://github.com/tamsri)
@@ -35,10 +35,11 @@ The documentation can be found at ***[radio-gyms.intelek.ai](https://radio-gyms.
 [//]: # (```)
 
 ## Community
+Feel free to suggest an idea or contribute with us.
 * [Discord](https://discord.gg/Rp2KhXcpPh)
 
 ## Road Map
-- [ ] v0.1.x - Radio Ray Tracer
+- [x] v0.1.x - Radio Ray Tracer
 - [ ] v0.2.x - Theoretical Outdoor Propagation Model
 - [ ] v0.3.x - Radio Transmitter and Receiver Controller
 - [ ] v0.4.x - Visualization for desktop
@@ -49,8 +50,6 @@ The documentation can be found at ***[radio-gyms.intelek.ai](https://radio-gyms.
 - [ ] v2.x.x - FDTD Model
 - [ ] v3.1.0 - Radio Gym 03: Indoor Environment
 - [ ] v3.2.0 - Radio Gym 04: Complex Transmission Control
-
-## News
 
 
 ## License
