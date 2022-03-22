@@ -41,7 +41,7 @@ class TestTracer(unittest.TestCase):
         result = box.is_intersect(ray)
         self.assertEqual(result, True)
 
-        ray_pos2 = np.array([0, 10, 0])
+        ray_pos2 = np.array([0, 100, 0])
         ray_dir2 = np.array([0, 1, 0])
         ray2 = (ray_pos2, ray_dir2)
         result2 = box.is_intersect(ray2)
@@ -70,3 +70,4 @@ class TestTracer(unittest.TestCase):
         tx_pos = np.array([0, 15, 0])
         rx_pos = np.array([-30, 1.5, 45])
         result = tracer.trace_roof_edges(tx_pos, rx_pos)
+        self.assertEqual()

@@ -5,6 +5,7 @@ import numpy as np
 
 from ...utils import ObjToTriangles, VecNorm, VecDistance, VecAngle, PosBetweenXZ
 from ...utils.constants import EPSILON, MIN_ROOF_EDGE_DISTANCE, ROOF_MIN_ANGLE, ROOF_MAX_SCAN, MAX_FLT
+from ...utils import VecNorm
 from .bvh import BVH
 
 
@@ -80,7 +81,7 @@ class Tracer:
         :return: reflection points
         """
         reflections = {'single': self.trace_single_reflect(tx_pos, rx_pos),
-                       # 'double': self.trace_double_reflect(tx_pos, rx_pos)
+                       'double': self.trace_double_reflect(tx_pos, rx_pos)
                        }
         return reflections
 
@@ -177,8 +178,6 @@ class Tracer:
         return []
 
     def find_edge(self, left_pos, right_pos):
-        max_scan = 20
-        min_angle = 0.0017
         min_x = min(left_pos[0], right_pos[0])
         max_x = max(left_pos[0], right_pos[0])
         min_z = min(left_pos[2], right_pos[2])
@@ -191,27 +190,38 @@ class Tracer:
         lower_ray = (left_pos, VecNorm(right_pos - left_pos))
 
         current_scan = 0
+        while current_scan < ROOF_MAX_SCAN and\
+                VecAngle(upper_ray[1], lower_ray[1]) > ROOF_MIN_ANGLE:
+            current_scan += 1
 
-        while current_scan < max_scan and\
-                VecAngle(upper_ray[1], lower_ray[1]) > min_angle:
-
-            new_dir = (upper_ray[1] + lower_ray[1]) / 2
+            new_dir = VecNorm((upper_ray[1] + lower_ray[1]) / 2)
             check_ray = (left_pos, new_dir)
 
             hit_nearest = self.map.is_intersect(check_ray)
-            if hit_nearest > 0 and PosBetweenXZ(min_x, max_x, min_z, max_z, left_pos + new_dir * hit_nearest):
+            if hit_nearest > 0 and  PosBetweenXZ(min_x, max_x, min_z, max_z,  left_pos + new_dir * hit_nearest):
                 lower_ray = check_ray
             else:
                 upper_ray = check_ray
 
-            left_pos_on_plane = np.array([left_pos[0], 0, left_pos[2]])
-            right_pos_on_plane = np.array([right_pos[0], 0, right_pos[2]])
-            plane_dir = VecNorm(right_pos_on_plane - left_pos_on_plane)
-            theta = VecAngle(plane_dir, lower_ray[1])
-            x_angle = VecAngle(lower_ray[1], upper_ray[1])
-            height = hit_nearest * np.cos(theta) * np.tan(theta + x_angle)
-            width = hit_nearest * np.cos(theta)
-            edge_distance = np.sqrt(height ** 2 + width ** 2)
-            edge_pos = upper_ray[0] + upper_ray[1] * edge_distance
-            return edge_pos
-        return None
+        distance = self.map.is_intersect(lower_ray)
+        if distance < 0:
+            return None
+
+        left_pos_on_plane = np.array([left_pos[0], 0, left_pos[2]])
+        right_pos_on_plane = np.array([right_pos[0], 0, right_pos[2]])
+        plane_dir = VecNorm(right_pos_on_plane - left_pos_on_plane)
+
+        theta = VecAngle(plane_dir, lower_ray[1])
+        x_angle = VecAngle(lower_ray[1], upper_ray[1])
+
+        height = distance * np.cos(theta) * np.tan(theta + x_angle)
+        width = distance * np.cos(theta)
+        edge_distance = np.sqrt(height ** 2 + width ** 2)
+        edge_pos = upper_ray[0] + upper_ray[1] * edge_distance
+        return edge_pos
+
+    def is_outdoor(self, pos):
+        sky_pos = np.copy(pos)
+        sky_pos[1] = 1000
+        return self.direct_path(pos, sky_pos)
+

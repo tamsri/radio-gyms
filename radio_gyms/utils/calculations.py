@@ -26,7 +26,8 @@ def position_between_xz(min_x, max_x, min_z, max_z, pos) -> bool:
 
 
 def vector_inverse(vector: NDArray) -> NDArray:
-    for i in range(3):
-        if vector[i] == 0:
-            vector[i] = EPSILON
-    return 1 / vector
+    inv_vec = np.copy(vector).astype('float64')
+    for i in range(len(vector)):
+        if inv_vec[i] == 0:
+            inv_vec[i] = EPSILON
+    return 1.0/inv_vec

@@ -14,9 +14,12 @@ class TestVirtualizer(TestCase):
         tracer = Tracer(POZNAN_OBJ_PATH)
         tx_pos = np.array([0, 5, 0])
         lines = []
-        for i in range(100):
-            rx_pos = (np.random.rand(3)*2-1)*100
-            rx_pos[1] = 1.2
+        for i in range(1):
+            while True:
+                rx_pos = (np.random.rand(3)*2-1)*100
+                rx_pos[1] = 1.2
+                if tracer.is_outdoor(rx_pos):
+                    break
             result = tracer.trace_outdoor(tx_pos, rx_pos)
             lines = lines + OutdoorResultToLines(result, tx_pos, rx_pos)
         window.line_sets = lines
