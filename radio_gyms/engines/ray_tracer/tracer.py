@@ -19,17 +19,21 @@ class Tracer:
         triangles = ObjToTriangles(object_file_path)
         self.map = BVH(triangles)
 
-    def trace_outdoor(self, tx_pos: NDArray, rx_pos: NDArray):
+    def trace_outdoor(self, tx_pos: List[float], rx_pos: List[float]):
         """
         Trace the possible ray paths from tx_pos to rx_pos in outdoor scenario (open sky)
         :param tx_pos: Transmitting Position
         :param rx_pos: Receiving Position
         :return: Outdoor Tracing Result
         """
+        tx_pos = np.array(tx_pos)
+        rx_pos = np.array(rx_pos)
         result = {
             "direct": True,
             "reflections": [],
-            "roofEdges": []
+            "roofEdges": [],
+            'tx_pos': tx_pos,
+            'rx_pos': rx_pos
         }
 
         if self.direct_path(tx_pos, rx_pos):
