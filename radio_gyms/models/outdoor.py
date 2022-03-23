@@ -21,6 +21,8 @@ class TheoreticalOutdoorModel:
 
     @staticmethod
     def calculate_free_space_loss(tx_pos, rx_pos, frequency, wave_speed=LIGHT_SPEED):
+        tx_pos = np.array(tx_pos)
+        rx_pos = np.array(rx_pos)
         distance = VecDistance(tx_pos, rx_pos)
         wave_length = wave_speed / frequency
         space_loss = (4 * np.pi * distance / wave_length) ** 2
@@ -32,6 +34,9 @@ class TheoreticalOutdoorModel:
                                          ref_medium_permittivity=5.31,
                                          polar='TM',
                                          wave_speed=LIGHT_SPEED):
+        tx_pos = np.array(tx_pos)
+        rx_pos = np.array(rx_pos)
+        ref_pos = np.array(ref_pos)
         # calculate coefficient
         assert polar == 'TM' or polar == 'TE'
         angle_1 = RefAngle(tx_pos, ref_pos, rx_pos)
@@ -60,6 +65,9 @@ class TheoreticalOutdoorModel:
 
     @staticmethod
     def calculate_knife_edge_diffraction(tx_pos, rx_pos, frequency: float, edges, wave_speed=LIGHT_SPEED):
+        tx_pos = np.array(tx_pos)
+        rx_pos = np.array(rx_pos)
+
         def calculate_v(left_pos, right_pos, edge_pos):
             tx_to_rx_dir = VecNorm(right_pos - left_pos)
             rx_to_tx_dir = -tx_to_rx_dir

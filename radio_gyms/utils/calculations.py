@@ -27,7 +27,7 @@ def position_between_xz(min_x, max_x, min_z, max_z, pos) -> bool:
 
 
 def vector_inverse(vector: NDArray) -> NDArray:
-    inv_vec = np.copy(vector).astype('float32')
+    inv_vec = np.copy(vector).astype('float64')
     for i in range(len(vector)):
         if inv_vec[i] == 0:
             inv_vec[i] = EPSILON

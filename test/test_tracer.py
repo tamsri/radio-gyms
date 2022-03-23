@@ -41,8 +41,8 @@ class TestTracer(unittest.TestCase):
         result = box.is_intersect(ray)
         self.assertEqual(result, True)
 
-        ray_pos2 = np.array([0, 100, 0])
-        ray_dir2 = np.array([0, 1, 0])
+        ray_pos2 = np.array([0, -1000, 0])
+        ray_dir2 = np.array([1, 0, 0])
         ray2 = (ray_pos2, ray_dir2)
         result2 = box.is_intersect(ray2)
         self.assertEqual(result2, False)
@@ -53,8 +53,8 @@ class TestTracer(unittest.TestCase):
         rx_pos = np.array([-30, 1.5, 45])
         result1 = tracer.trace_outdoor(tx_pos, rx_pos)
         self.assertEqual(result1["direct"], False)
-        tx_pos2 = np.array([0, 100, 0])
-        rx_pos2 = np.array([0, 101, 0])
+        tx_pos2 = np.array([0, -100, 0])
+        rx_pos2 = np.array([0, -1, 0])
         result2 = tracer.trace_outdoor(tx_pos2, rx_pos2)
         self.assertEqual(result2["direct"], True)
 
@@ -64,9 +64,21 @@ class TestTracer(unittest.TestCase):
         rx_pos = np.array([-30, 1.5, 45])
         result = tracer.trace_single_reflect(tx_pos, rx_pos)
         self.assertEqual(len(result), 2)
+        ref_1 = result[0]
+        ref_2 = result[1]
+        self.assertAlmostEqual(ref_1[0], -28.94, 1)
+        self.assertAlmostEqual(ref_1[1], 4.22, 1)
+        self.assertAlmostEqual(ref_1[2], 62.39, 1)
+        self.assertAlmostEqual(ref_2[0], -70.80, 1)
+        self.assertAlmostEqual(ref_2[1], 7.04, 1)
+        self.assertAlmostEqual(ref_2[2], 15.22, 1)
 
     def test_roof_diffraction(self):
         tracer = Tracer(POZNAN_OBJ_PATH)
         tx_pos = np.array([0, 15, 0])
         rx_pos = np.array([-30, 1.5, 45])
         result = tracer.trace_roof_edges(tx_pos, rx_pos)
+        self.assertEqual(len(result), 1)
+        self.assertAlmostEqual(result[0][0], -19.24, 1)
+        self.assertAlmostEqual(result[0][1], 8.56, 1)
+        self.assertAlmostEqual(result[0][2], 28.86, 1)
