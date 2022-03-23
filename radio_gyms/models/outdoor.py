@@ -2,7 +2,7 @@ from typing import List, Tuple
 
 import numpy as np
 
-from ..utils import VecDistance, RefAngle, VecNorm, VecAngle, SortPointsFromPlaneY
+from ..utils import VecDistance, RefAngle, VecNorm, VecAngle, SortPointsFromPlaneY, dBmTomW, mWTodBm
 from ..utils.constants import LIGHT_SPEED
 
 
@@ -15,8 +15,9 @@ class TheoreticalOutdoorModel:
     """
     result = None
 
-    def __init__(self, result):
+    def __init__(self, result, tx_power_dBm):
         self.result = result
+        self.tx_power_dBm = tx_power_dBm
 
     @staticmethod
     def calculate_free_space_loss(tx_pos, rx_pos, frequency, wave_speed=LIGHT_SPEED):
@@ -26,11 +27,11 @@ class TheoreticalOutdoorModel:
         return 10 * np.log10(space_loss)
 
     @staticmethod
-    def calculate_reflection(tx_pos, rx_pos, ref_pos, frequency,
-                             tx_medium_permittivity=1,
-                             ref_medium_permittivity=5.31,
-                             polar='TM',
-                             wave_speed=LIGHT_SPEED):
+    def calculate_single_reflection_loss(tx_pos, rx_pos, ref_pos, frequency,
+                                         tx_medium_permittivity=1,
+                                         ref_medium_permittivity=5.31,
+                                         polar='TM',
+                                         wave_speed=LIGHT_SPEED):
         # calculate coefficient
         assert polar == 'TM' or polar == 'TE'
         angle_1 = RefAngle(tx_pos, ref_pos, rx_pos)
@@ -93,39 +94,37 @@ class TheoreticalOutdoorModel:
             d3 = VecDistance(center_on_y, near_rx_on_y)
             d4 = VecDistance(near_rx_on_y, rx_pos_on_y)
 
-            cos_1 = np.sqrt((d1*(d3+d4))/((d1+d2)*(d2+d3+d4)))
-            cos_2 = np.sqrt((d4*(d1+d2))/((d3+d4)*(d2+d3+d1)))
+            cos_1 = np.sqrt((d1 * (d3 + d4)) / ((d1 + d2) * (d2 + d3 + d4)))
+            cos_2 = np.sqrt((d4 * (d1 + d2)) / ((d3 + d4) * (d2 + d3 + d1)))
 
-            correct_1 = (6-center_c_+near_tx_c_)*cos_1
-            correct_2 = (6-center_c_+near_rx_c_)*cos_2
+            correct_1 = (6 - center_c_ + near_tx_c_) * cos_1
+            correct_2 = (6 - center_c_ + near_rx_c_) * cos_2
             return correct_1 + correct_2
 
         def sort_edge_by_v(unsorted_edges):
-            return None
+            return sorted(unsorted_edges, key=lambda edge: calculate_v(tx_pos, rx_pos, edge))
 
-        edge_n = len(edges)
+        def single_edge_loss(single_edge):
+            v = calculate_v(single_edge)
+            diff_loss = calculate_c(v)
+            return diff_loss
 
-        loss = TheoreticalOutdoorModel.calculate_free_space_loss(tx_pos, rx_pos, frequency, wave_speed)
-
-        sorted_edges = SortPointsFromPlaneY(tx_pos, edges)
-        if edge_n == 1:
-            v = calculate_v(sorted_edges[0])
-            c = calculate_c(v)
-            loss += c
-        elif edge_n == 2:
-            near_tx_edge = sorted_edges[0]
-            near_tx_v = calculate_v(near_tx_edge)
-            near_rx_edge = sorted_edges[1]
-            near_rx_v = calculate_v(near_rx_edge)
-            if near_tx_v > near_rx_v:
-                main_c = calculate_c(near_tx_v)
-                support_c = calculate_c(calculate_v(near_tx_edge, rx_pos, near_rx_edge))
+        def double_edge_loss(double_edges):
+            near_tx_edge_i = double_edges[0]
+            near_tx_v_i = calculate_v(near_tx_edge_i)
+            near_rx_edge_i = double_edges[1]
+            near_rx_v_i = calculate_v(near_rx_edge_i)
+            if near_tx_v_i > near_rx_v_i:
+                main_c = calculate_c(near_tx_v_i)
+                support_c = calculate_c(calculate_v(near_tx_edge_i, rx_pos, near_rx_edge_i))
             else:
-                main_c = calculate_c(near_rx_v)
-                support_c = calculate_c(calculate_v(tx_pos, near_rx_edge, near_tx_edge))
-            loss += main_c + support_c
-        elif edge_n > 3:
-            if edge_n == 3:
+                main_c = calculate_c(near_rx_v_i)
+                support_c = calculate_c(calculate_v(tx_pos, near_rx_edge_i, near_tx_edge_i))
+            diff_loss = main_c + support_c
+            return diff_loss
+
+        def more_edge_loss(more_edges):
+            if len(more_edges) == 3:
                 near_tx_edge = sorted_edges[0]
                 center_edge = sorted_edges[1]
                 near_rx_edge = sorted_edges[2]
@@ -160,18 +159,56 @@ class TheoreticalOutdoorModel:
             near_rx_c = calculate_c(near_rx_v)
             total_correct = calculate_correction(near_tx_edge, center_edge, near_rx_edge,
                                                  near_tx_c, center_c, near_rx_c)
-            loss = main_c + support_c_1 + support_c_2 - total_correct
+            diff_loss = main_c + support_c_1 + support_c_2 - total_correct
+            return diff_loss
 
+        edge_n = len(edges)
+        loss = TheoreticalOutdoorModel.calculate_free_space_loss(tx_pos, rx_pos, frequency, wave_speed)
+
+        sorted_edges = SortPointsFromPlaneY(tx_pos, edges)
+        if edge_n == 1:
+            loss += single_edge_loss(edges[0])
+        elif edge_n == 2:
+            loss += double_edge_loss(sorted_edges)
+        elif edge_n > 3:
+            loss += more_edge_loss(sorted_edges)
         return loss
 
-    def calculate_propagation_loss(self, frequency: float = 2.4e9) -> float:
+    def calculate_max_received_power(self, frequency: float = 2.4e9, wave_speed=LIGHT_SPEED) -> float:
         tx_pos = self.result['tx_pos']
         rx_pos = self.result['rx_pos']
+        receive_power_dbms = []
+        free_space_loss = TheoreticalOutdoorModel.calculate_free_space_loss(tx_pos, rx_pos,
+                                                                            frequency, wave_speed)
 
         if self.result['direct']:
-            pass
+            receive_power_dbm = self.tx_power_dBm - free_space_loss
+            receive_power_dbms.append(receive_power_dbm)
         else:
-            pass
+            knife_edges = self.result['roof_edges']
+            diffraction_loss = TheoreticalOutdoorModel.calculate_knife_edge_diffraction(tx_pos,
+                                                                                        rx_pos,
+                                                                                        frequency,
+                                                                                        knife_edges,
+                                                                                        wave_speed)
+            receive_power_dbm = self.tx_power_dBm - diffraction_loss
+            receive_power_dbms.append(receive_power_dbm)
 
-    def calculate_propagation_delay(self) -> List[Tuple[float, float]]:
-        pass
+        for ref_pos in self.result['reflections']['single']:
+            reflected_loss = TheoreticalOutdoorModel.calculate_single_reflection_loss(tx_pos,
+                                                                                      rx_pos,
+                                                                                      ref_pos,
+                                                                                      frequency,
+                                                                                      wave_speed=wave_speed)
+            reflected_received_power_dbm = self.tx_power_dBm - reflected_loss
+            receive_power_dbms.append(reflected_received_power_dbm)
+
+        received_power_mw = 0
+        for receive_power_dbm in receive_power_dbms:
+            received_power_mw += dBmTomW(receive_power_dbm)
+        return mWTodBm(received_power_mw)
+
+    def calculate_propagation_delay(self, wave_speed=LIGHT_SPEED) -> List[Tuple[float, float]]:
+        tx_pos = self.result['tx_pos']
+        rx_pos = self.result['rx_pos']
+        return None

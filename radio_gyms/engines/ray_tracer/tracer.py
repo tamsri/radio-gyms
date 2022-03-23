@@ -31,7 +31,7 @@ class Tracer:
         result = {
             "direct": True,
             "reflections": [],
-            "roofEdges": [],
+            "roof_edges": [],
             'tx_pos': tx_pos,
             'rx_pos': rx_pos
         }

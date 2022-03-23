@@ -1,5 +1,5 @@
 from typing import List
-
+import numpy as np
 
 def outdoor_traced_result_to_line(result, tx_pos, rx_pos) -> List[List]:
     lines = []
@@ -21,3 +21,9 @@ def outdoor_traced_result_to_line(result, tx_pos, rx_pos) -> List[List]:
                 line = {'points': [tx_pos] + reflect_points + [rx_pos], 'color': [0.3, .3, 0.75, 1.0]}
                 lines.append(line)
     return lines
+
+def dbm_to_mw(dbm_value: float) -> float:
+    return 10**(dbm_value/10)
+
+def mw_to_dbm(mw_value: float) -> float:
+    return 10*np.log10(mw_value)
