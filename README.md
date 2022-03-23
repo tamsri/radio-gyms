@@ -15,7 +15,7 @@ pip install radio_gyms
 Radio gyms provides the toolkit for building wireless communication simulations. 
 The ray tracer can be called for computing the radio propagation paths in the following example.
 ```python
-import radio_gyms.engines as Tracer
+from radio_gyms.engines import Tracer
 
 SCENE_FILE_PATH = "./city.obj"
 tracer = Tracer(SCENE_FILE_PATH)
@@ -40,7 +40,7 @@ The official documentation can be found at ***[radio-gyms.intelek.ai](https://ra
 
 ## Contributors
 - [Supawat Tamsri](https://github.com/tamsri)
-- Krysztof Cichoń
+- [Krzysztof Cichoń](https://scholar.google.pl/citations?user=GmzK3-oAAAAJ)
 
 [//]: # (## Citation)
 
