@@ -65,9 +65,10 @@ class TheoreticalOutdoorModel:
         return 10 * np.log10(loss)
 
     @staticmethod
-    def calculate_knife_edge_diffraction(tx_pos, rx_pos, frequency: float, edges, wave_speed=LIGHT_SPEED):
+    def calculate_knife_edge_diffraction(tx_pos, rx_pos, frequency: float, edges: List, wave_speed=LIGHT_SPEED):
         tx_pos = np.array(tx_pos)
         rx_pos = np.array(rx_pos)
+        edges = [np.array(edge) for edge in edges]
 
         def calculate_v(left_pos, right_pos, edge_pos):
             tx_to_rx_dir = VecNorm(right_pos - left_pos)
@@ -85,7 +86,7 @@ class TheoreticalOutdoorModel:
             return h * np.sqrt((2 * (s_1 + s_2)) / (wave_length * r_1 * r_2))
 
         def calculate_c(v: float):
-            return 6.9 + 20 * np.log(np.sqrt((v - 0.1) ** 2 + 1) + v - 0.1)
+            return 6.9 + 20 * np.log10(np.sqrt((v - 0.1) ** 2 + 1) + v - 0.1)
 
         def calculate_correction(near_tx_pos, center_pos, near_rx_pos, near_tx_c_, center_c_, near_rx_c_):
             tx_pos_on_y = np.copy(tx_pos)
@@ -114,15 +115,15 @@ class TheoreticalOutdoorModel:
             return sorted(unsorted_edges, key=lambda edge: calculate_v(tx_pos, rx_pos, edge))
 
         def single_edge_loss(single_edge):
-            v = calculate_v(single_edge)
+            v = calculate_v(tx_pos, rx_pos, single_edge)
             diff_loss = calculate_c(v)
             return diff_loss
 
         def double_edge_loss(double_edges):
             near_tx_edge_i = double_edges[0]
-            near_tx_v_i = calculate_v(near_tx_edge_i)
+            near_tx_v_i = calculate_v(tx_pos, rx_pos, near_tx_edge_i)
             near_rx_edge_i = double_edges[1]
-            near_rx_v_i = calculate_v(near_rx_edge_i)
+            near_rx_v_i = calculate_v(tx_pos, rx_pos, near_rx_edge_i)
             if near_tx_v_i > near_rx_v_i:
                 main_c = calculate_c(near_tx_v_i)
                 support_c = calculate_c(calculate_v(near_tx_edge_i, rx_pos, near_rx_edge_i))
@@ -143,6 +144,7 @@ class TheoreticalOutdoorModel:
                 near_tx_edge = sorted_top_edge[0]
                 center_edge = sorted_top_edge[1]
                 near_rx_edge = sorted_edges[2]
+
             near_tx_v = calculate_v(tx_pos, rx_pos, near_tx_edge)
             center_v = calculate_v(tx_pos, rx_pos, center_edge)
             near_rx_v = calculate_v(tx_pos, rx_pos, near_rx_edge)
@@ -172,14 +174,15 @@ class TheoreticalOutdoorModel:
             return diff_loss
 
         edge_n = len(edges)
-        loss = TheoreticalOutdoorModel.calculate_free_space_loss(tx_pos, rx_pos, frequency, wave_speed)
 
+        loss = TheoreticalOutdoorModel.calculate_free_space_loss(tx_pos, rx_pos, frequency, wave_speed)
         sorted_edges = SortPointsFromPlaneY(tx_pos, edges)
         if edge_n == 1:
-            loss += single_edge_loss(edges[0])
+            single_loss = single_edge_loss(edges[0])
+            loss += single_loss
         elif edge_n == 2:
             loss += double_edge_loss(sorted_edges)
-        elif edge_n > 3:
+        elif edge_n >= 3:
             loss += more_edge_loss(sorted_edges)
         return loss
 
@@ -216,6 +219,25 @@ class TheoreticalOutdoorModel:
         for receive_power_dbm in receive_power_dbms:
             received_power_mw += dBmTomW(receive_power_dbm)
         return mWTodBm(received_power_mw)
+
+    @staticmethod
+    def calculate_signal_delay(tx_pos, rx_pos, points=[], wave_speed=LIGHT_SPEED):
+        tx_pos = np.array(tx_pos)
+        rx_pos = np.array(rx_pos)
+        points = [np.array(point) for point in points]
+        distance = 0
+        if len(points) == 0:
+            distance += VecDistance(tx_pos, rx_pos)
+        else:
+            left_pos = tx_pos
+            for i in range(len(points)):
+                right_pos = points[i]
+                distance += VecDistance(left_pos, right_pos)
+                left_pos = points[i]
+            right_pos = rx_pos
+            distance += VecDistance(left_pos, right_pos)
+        delay = distance/wave_speed
+        return delay
 
     def calculate_propagation_delay(self, wave_speed=LIGHT_SPEED) -> List[Tuple[float, float]]:
         tx_pos = self.result['tx_pos']
