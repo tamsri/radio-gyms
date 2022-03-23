@@ -39,11 +39,12 @@ class TheoreticalOutdoorModel:
         ref_pos = np.array(ref_pos)
         # calculate coefficient
         assert polar == 'TM' or polar == 'TE'
+
         angle_1 = RefAngle(tx_pos, ref_pos, rx_pos)
         c_1 = wave_speed / np.sqrt(tx_medium_permittivity)
         c_2 = wave_speed / np.sqrt(ref_medium_permittivity)
         angle_2 = np.arcsin(c_2 * np.sin(angle_1) / c_1)
-        bias = np.sqrt(np.abs(tx_medium_permittivity, ref_medium_permittivity) * np.sin(angle_1))
+        bias = np.sqrt(np.abs(tx_medium_permittivity/ref_medium_permittivity) * np.sin(angle_1))
         if bias >= 1:
             coefficient = 1
         else:

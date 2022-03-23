@@ -48,4 +48,4 @@ def sort_nearest_points_from_on_plane_y(ref_pos: NDArray, points: List[NDArray])
 def calculate_reflection_angle(tx_pos, ref_pos, rx_pos):
     ref_tx_dir = normalize(tx_pos-ref_pos)
     ref_rx_dir = normalize(rx_pos-ref_pos)
-    return vector_angle(ref_tx_dir, ref_rx_dir)
+    return vector_angle(ref_tx_dir, ref_rx_dir)/2

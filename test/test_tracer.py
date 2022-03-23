@@ -9,15 +9,16 @@ from numpy.typing import NDArray
 
 POZNAN_OBJ_PATH = os.path.join(os.getcwd(), "assets", "models", "poznan.obj")
 
+
 class TestTracer(unittest.TestCase):
 
     def test_triangle(self):
-        a:NDArray = np.array([5,0,-3])
-        b:NDArray = np.array([-5,0,-2])
-        c:NDArray = np.array([0,-4,4])
+        a: NDArray = np.array([5, 0, -3])
+        b: NDArray = np.array([-5, 0, -2])
+        c: NDArray = np.array([0, -4, 4])
         test_triangle = Triangle(a, b, c)
 
-        ray_pos = np.array([0, 15 ,0])
+        ray_pos = np.array([0, 15, 0])
         ray_dir = np.array([0, -1, 0])
         ray = (ray_pos, ray_dir)
         result = test_triangle.is_intersect(ray)
