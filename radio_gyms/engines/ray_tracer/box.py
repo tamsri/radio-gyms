@@ -39,8 +39,9 @@ class Box:
         :return: true/false
         """
         # Optimized from the algorithm: "fast branch-less ray-bounding box intersection"
-        ray_pos: NDArray = ray[0]
-        ray_inv_dir: NDArray = VecInv(ray[1])
+        ray_pos: NDArray = np.array(ray[0])
+        ray_inv_dir: NDArray = VecInv(np.array(ray[1]))
+
         min_bound_check = (self.min_bound - ray_pos) * ray_inv_dir
         max_bound_check = (self.max_bound - ray_pos) * ray_inv_dir
         t1, t3, t5 = min_bound_check

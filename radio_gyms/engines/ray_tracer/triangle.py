@@ -3,7 +3,7 @@ import numpy as np
 from typing import Tuple
 from numpy.typing import NDArray
 
-from ...utils.calculations import normalize as VecNorm
+from ...utils import VecNorm
 from ...utils.constants import EPSILON
 
 

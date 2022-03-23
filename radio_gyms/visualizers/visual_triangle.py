@@ -1,3 +1,6 @@
+"""
+This file is currently not used, it was replaced by pywavefront to avoid the complexity.
+"""
 import ctypes
 from typing import List
 from pyglet.gl import glUseProgram, GLchar, glCreateShader,\

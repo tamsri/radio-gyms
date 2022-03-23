@@ -24,4 +24,4 @@ class TestVirtualizer(TestCase):
             lines = lines + OutdoorResultToLines(result, tx_pos, rx_pos)
         window.line_sets = lines
         window.load_obj_to_scene(POZNAN_OBJ_PATH)
-        window.run()
+        # window.run()
