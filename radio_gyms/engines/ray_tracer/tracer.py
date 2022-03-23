@@ -3,9 +3,9 @@ from numpy.typing import NDArray
 
 import numpy as np
 
-from ...utils import ObjToTriangles, VecNorm, VecDistance, VecAngle, PosBetweenXZ, SortPointsFromPlaneY
+from ..ray_tracer.obj_reader import ObjToTriangles
+from ...utils import VecNorm, VecDistance, VecAngle, PosBetweenXZ, SortPointsFromPlaneY
 from ...utils.constants import EPSILON, MIN_ROOF_EDGE_DISTANCE, ROOF_MIN_ANGLE, ROOF_MAX_SCAN, MAX_FLT
-from ...utils import VecNorm
 from .bvh import BVH
 
 

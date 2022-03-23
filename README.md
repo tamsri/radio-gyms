@@ -29,11 +29,31 @@ result = tracer.trace_outdoor(tx_pos, rx_pos)
 # 'reflections': {'single': [   array([-28.94988531,   4.22886929,  62.39469675]),
 #                               array([-70.80339945,   7.04682531,  15.22840999])],
 #                  'double': []},
+# 'roof_edges': [array([-19.24403786,   8.5621709 ,  28.8660568 ]
 # 'tx_pos': array([ 0, 15,  0]),
 # 'rx_pos': array([-30. ,   1.5,  45. ]),
-# 'roof_edges': [array([-19.24403786,   8.5621709 ,  28.8660568 ])]}
+# )]}
 ```
-
+### 2. Calculate the traced result with the theoretical outdoor model
+```python
+from radio_gyms.models import TheoreticalOutdoorModel
+result = {
+    'direct': False, 
+    'reflections': {'single': [ [-28.94988531, 4.22886929, 62.39469675],
+                                [-70.80339945, 7.04682531, 15.22840999]],
+                    'double': []},
+    'roof_edges': [[-19.24403786, 8.5621709 , 28.8660568 ]],
+    'tx_pos': [ 0, 15, 0],
+    'rx_pos': [-30., 1.5, 45. ],
+}
+model = TheoreticalOutdoorModel(result, tx_power_dbm=20)
+maximum_received_power = model.calculate_max_received_power(frequency=5.4e9) 
+# -72.51 dBm
+impulses = model.calculate_signal_impulses(freq=5.4e9)
+# [{'strength': -85.94590320344925, 'delay': 1.8653420787826134e-07},
+# {'strength': -74.3214622218488, 'delay': 2.910702009034143e-07}, 
+# {'strength': -77.80902883055407, 'delay': 4.125241781539828e-07}]
+```
 ## Documentation
 Radio Gyms provides radio propagation engines and tools for customizations.
 The official documentation can be found at ***[radio-gyms.intelek.ai](https://radio-gyms.intelek.ai)***
@@ -64,7 +84,7 @@ Feel free to suggest an idea or contribute with us.
 
 ## Road Map
 - [x] v0.1.x - Radio Ray Tracer
-- [ ] v0.2.x - Theoretical Outdoor Propagation Model
+- [x] v0.2.x - Theoretical Outdoor Propagation Model
 - [ ] v0.3.x - Radio Transmitter and Receiver Controller
 - [ ] v0.4.x - Visualization for desktop
 - [ ] v0.5.x - Visualization for notebook

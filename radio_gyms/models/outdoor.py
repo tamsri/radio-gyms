@@ -15,9 +15,9 @@ class TheoreticalOutdoorModel:
     """
     result = None
 
-    def __init__(self, result, tx_power_dBm):
+    def __init__(self, result, tx_power_dbm: float):
         self.result = result
-        self.tx_power_dBm = tx_power_dBm
+        self.tx_power_dBm = tx_power_dbm
 
     @staticmethod
     def calculate_free_space_loss(tx_pos, rx_pos, frequency, wave_speed=LIGHT_SPEED):
@@ -41,10 +41,8 @@ class TheoreticalOutdoorModel:
         assert polar == 'TM' or polar == 'TE'
 
         angle_1 = RefAngle(tx_pos, ref_pos, rx_pos)
-        c_1 = wave_speed / np.sqrt(tx_medium_permittivity)
-        c_2 = wave_speed / np.sqrt(ref_medium_permittivity)
-        angle_2 = np.arcsin(c_2 * np.sin(angle_1) / c_1)
-        bias = np.sqrt(np.abs(tx_medium_permittivity/ref_medium_permittivity) * np.sin(angle_1))
+        angle_2 = np.arcsin(np.sqrt(tx_medium_permittivity) * np.sin(angle_1) / np.sqrt(ref_medium_permittivity))
+        bias = np.sqrt(np.abs(tx_medium_permittivity / ref_medium_permittivity) * np.sin(angle_1))
         if bias >= 1:
             coefficient = 1
         else:
@@ -236,10 +234,41 @@ class TheoreticalOutdoorModel:
                 left_pos = points[i]
             right_pos = rx_pos
             distance += VecDistance(left_pos, right_pos)
-        delay = distance/wave_speed
+        delay = distance / wave_speed
         return delay
 
-    def calculate_propagation_delay(self, wave_speed=LIGHT_SPEED) -> List[Tuple[float, float]]:
+    def calculate_signal_impulses(self, freq: float = 2.4e9,
+                                  wave_speed: float = LIGHT_SPEED) -> List[Tuple[float, float]]:
+        impulses = []
         tx_pos = self.result['tx_pos']
         rx_pos = self.result['rx_pos']
-        return None
+        if self.result['direct']:
+            rev_power_dbm = self.tx_power_dBm - self.calculate_free_space_loss(tx_pos, rx_pos, freq, wave_speed)
+            rev_delay = self.calculate_signal_delay(tx_pos, rx_pos)
+            impulse = {'strength': rev_power_dbm,
+                       'delay': rev_delay}
+            impulses.append(impulse)
+        else:
+            knife_edges = self.result['roof_edges']
+            diffraction_loss = TheoreticalOutdoorModel.calculate_knife_edge_diffraction(tx_pos,
+                                                                                        rx_pos,
+                                                                                        freq,
+                                                                                        knife_edges,
+                                                                                        wave_speed=wave_speed)
+            rev_power_dbm = self.tx_power_dBm - diffraction_loss
+            rev_delay = self.calculate_signal_delay(tx_pos, rx_pos, knife_edges)
+            impulse = {'strength': rev_power_dbm,
+                       'delay': rev_delay}
+            impulses.append(impulse)
+        for ref_pos in self.result['reflections']['single']:
+            reflected_loss = TheoreticalOutdoorModel.calculate_single_reflection_loss(tx_pos,
+                                                                                      rx_pos,
+                                                                                      ref_pos,
+                                                                                      freq,
+                                                                                      wave_speed=wave_speed)
+            rev_power_dbm = self.tx_power_dBm - reflected_loss
+            rev_delay = self.calculate_signal_delay(tx_pos, rx_pos, [ref_pos])
+            impulse = {'strength': rev_power_dbm,
+                       'delay': rev_delay}
+            impulses.append(impulse)
+        return impulses
