@@ -75,15 +75,22 @@ The official documentation can be found at ***[radio-gyms.intelek.ai](https://ra
 - [Muhammad Aamir Khan](https://scholar.google.com/citations?user=Q7YdzQEAAAAJ)
 - [Krzysztof Cichoń](https://scholar.google.com/citations?user=GmzK3-oAAAAJ)
 
-## Citation
+[//]: # (## Citation)
 
-```
-@article{
-	title={Radio Gyms : Radio Communication Simulations for Intelligent Agents},
-	author={Supawat Tamsri, Muhammad Aamir Khan, Krysztof Cichoń},
-	year={2022}
-}
-```
+[//]: # ()
+[//]: # (```)
+
+[//]: # (@article{)
+
+[//]: # (	title={Radio Gyms : Radio Communication Simulations for Intelligent Agents},)
+
+[//]: # (	author={Supawat Tamsri, Muhammad Aamir Khan, Krzysztof Cichoń},)
+
+[//]: # (	year={2022})
+
+[//]: # (})
+
+[//]: # (```)
 
 ## Community
 Feel free to suggest an idea or contribute with us.
