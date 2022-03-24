@@ -5,12 +5,24 @@
 Radio Gyms is an open-source bundle of AI environments for radio communications. The simulations are composed of Open AI Gym and various theoretical radio propagation models, specifically for AI research in telecommunications. 
 
 ## Installation
-
-```commandline
+### PyPi Package via pip
+```shell
 pip install radio_gyms
 ```
-
-## Examples
+### Build from source
+```shell
+git clone https://github.com/intelek-ai/radio-gyms
+cd radio-gyms
+python -m pip install .
+cd ..
+rm -rf radio_gyms
+```
+### Dependencies
+* python 3.8+
+* numpy
+* pyglet
+* pywavefront
+## Features
 ### 1. Calling Primitive Ray Tracer for Outdoor Propagation
 Radio gyms provides the toolkit for building wireless communication simulations. 
 The ray tracer can be called for computing the radio propagation paths in the following example.
@@ -60,23 +72,18 @@ The official documentation can be found at ***[radio-gyms.intelek.ai](https://ra
 
 ## Contributors
 - [Supawat Tamsri](https://github.com/tamsri)
-- [Krzysztof Cichoń](https://scholar.google.pl/citations?user=GmzK3-oAAAAJ)
+- [Muhammad Aamir Khan](https://scholar.google.com/citations?user=Q7YdzQEAAAAJ)
+- [Krzysztof Cichoń](https://scholar.google.com/citations?user=GmzK3-oAAAAJ)
 
-[//]: # (## Citation)
+## Citation
 
-[//]: # (```)
-
-[//]: # (@article{)
-
-[//]: # (	title={Radio Gyms},)
-
-[//]: # (	author={Supawat Tamsri and Krysztof Cichoń},)
-
-[//]: # (	year={2022})
-
-[//]: # (})
-
-[//]: # (```)
+```
+@article{
+	title={Radio Gyms : Radio Communication Simulations for Intelligent Agents},
+	author={Supawat Tamsri, Muhammad Aamir Khan, Krysztof Cichoń},
+	year={2022}
+}
+```
 
 ## Community
 Feel free to suggest an idea or contribute with us.
@@ -85,10 +92,11 @@ Feel free to suggest an idea or contribute with us.
 ## Road Map
 - [x] v0.1.x - Radio Ray Tracer
 - [x] v0.2.x - Theoretical Outdoor Propagation Model
-- [ ] v0.3.x - Radio Transmitter and Receiver Controller
+- [x] v0.3.x - Transmitter and Receiver Controller
 - [ ] v0.4.x - Visualization for desktop
 - [ ] v0.5.x - Visualization for notebook
 - [ ] v0.6.x - Outdoor Simulation
+- [ ] v0.9.x - Official Documentations
 - [ ] v1.0.0 - Radio Gym 01: Beam Steering
 - [ ] v1.5.0 - Radio Gym 02: Beam-forming Control by Antenna Array
 - [ ] v2.x.x - FDTD Model
@@ -97,4 +105,7 @@ Feel free to suggest an idea or contribute with us.
 
 
 ## License
-**© Intelek AI [MIT](https://github.com/intelek-ai/radio-gyms/blob/master/LICENSE)**.
+
+The digital contents in ```/assets``` are available under Creative Commons (CC) license.
+
+Source code is licensed under **© Intelek AI [MIT](https://github.com/intelek-ai/radio-gyms/blob/master/LICENSE)**.
