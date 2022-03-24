@@ -10,7 +10,8 @@ from .bvh import BVH
 
 
 class Tracer:
-
+    min_bound = None
+    max_bound = None
     def __init__(self, object_file_path):
         """
         Initialize Map for Ray Tracer
@@ -18,6 +19,8 @@ class Tracer:
         """
         triangles = ObjToTriangles(object_file_path)
         self.map = BVH(triangles)
+        self.min_bound = self.map.root.min_bound
+        self.max_bound = self.map.root.max_bound
 
     def trace_outdoor(self, tx_pos: List[float], rx_pos: List[float]):
         """
