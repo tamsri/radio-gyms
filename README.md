@@ -98,7 +98,7 @@ for i in range(100):
     window.render()
     window.dispatch_events()
 ```
-![Old Town Simulation's Visualization](https://github.com/intelek-ai/radio-gyms/blob/master/assets/examples/oldtown.png)
+![Old Town Simulation's Visualization](https://github.com/intelek-ai/radio-gyms/blob/master/assets/examples/oldtown.gif)
 
 ## Gyms
 ### 1. ```radio-gym-01``` : Cooperative Small Cell Power Switching (Coming soon, V1.0.0)
