@@ -1,9 +1,9 @@
+from time import sleep
 from pyglet.window import Window, key
 from pyglet.gl import glClearColor, glBegin, glEnd, GL_LINE_STRIP,\
     glVertex3f, glColor4f, glLineWidth, glMatrixMode, GL_PROJECTION,\
     glLoadIdentity, gluPerspective, GL_MODELVIEW, glTranslatef, glRotatef,\
     glEnable, GL_DEPTH_TEST, glDrawArrays, GL_TRIANGLES, glPushMatrix
-
 import logging
 from pywavefront import visualization, Wavefront, configure_logging
 
@@ -30,8 +30,8 @@ class VisualizerWindow(Window):
                  camera_rotation=[33, -230, 0],
                  resizable=True,
                  background_color=[0,0,0,1],
-                 zoom = 66):
-
+                 zoom = 50):
+        
         self.window_size = window_size
         self.camera_position = camera_position
         self.camera_rotation = camera_rotation
@@ -42,7 +42,7 @@ class VisualizerWindow(Window):
         self.clear_color = background_color
         self.line_sets = []
         self.scenes = []
-
+        self.refresh_rate = 30
         super().__init__(width=window_size[0],
                          height=window_size[1],
                          resizable = resizable,
@@ -113,7 +113,7 @@ class VisualizerWindow(Window):
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
         gluPerspective(self.zoom, self.window_size[0] /
-                       float(self.window_size[1]), .1, 1000)
+                       float(self.window_size[1]), .2, 1000)
         glMatrixMode(GL_MODELVIEW)
         glDrawArrays(GL_TRIANGLES, 0, 3)
         glLoadIdentity()
@@ -130,5 +130,6 @@ class VisualizerWindow(Window):
 
     def run(self):
         while self.alive:
-            event = self.dispatch_events()
             self.render()
+            event = self.dispatch_events()
+            sleep(1.0/self.refresh_rate)

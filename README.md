@@ -100,7 +100,7 @@ Feel free to suggest an idea or contribute with us.
 - [x] v0.1.x - Radio Ray Tracer
 - [x] v0.2.x - Theoretical Outdoor Propagation Model
 - [x] v0.3.x - Transmitter and Receiver Controller
-- [ ] v0.4.x - Visualization for desktop
+- [x] v0.4.x - Visualization for desktop
 - [ ] v0.5.x - Visualization for notebook
 - [ ] v0.6.x - Outdoor Simulation
 - [ ] v0.9.x - Official Documentations

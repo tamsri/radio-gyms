@@ -12,7 +12,8 @@ from .bvh import BVH
 class Tracer:
     min_bound = None
     max_bound = None
-    def __init__(self, object_file_path):
+    ref_max = None
+    def __init__(self, object_file_path, ref_max = 2):
         """
         Initialize Map for Ray Tracer
         :param object_file_path:
@@ -21,7 +22,7 @@ class Tracer:
         self.map = BVH(triangles)
         self.min_bound = self.map.root.min_bound
         self.max_bound = self.map.root.max_bound
-
+        self.ref_max = ref_max
     def trace_outdoor(self, tx_pos: List[float], rx_pos: List[float]):
         """
         Trace the possible ray paths from tx_pos to rx_pos in outdoor scenario (open sky)
@@ -95,6 +96,8 @@ class Tracer:
         return reflections
 
     def trace_single_reflect(self, tx_pos, rx_pos) -> List[NDArray]:
+        if self.ref_max < 1:
+            return  []
         single_reflections = []
         for triangle in self.map.root.triangles:
             mirror_point = Tracer.get_mirror_point(tx_pos, triangle)
@@ -110,6 +113,8 @@ class Tracer:
         return single_reflections
 
     def trace_double_reflect(self, tx_pos, rx_pos):
+        if self.ref_max < 2:
+            return []
         double_reflections = []
         tx_mirror_points = []
         rx_mirror_points = []

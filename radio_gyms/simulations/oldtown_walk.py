@@ -6,6 +6,7 @@ from ..engines import Tracer
 from ..objects import Pedestrian, Cell
 from ..models import TheoreticalOutdoorModel as OutdoorModel
 
+
 class OldtownWalk:
     tracer: Tracer = None
     cells: List[Cell] = []
@@ -16,26 +17,27 @@ class OldtownWalk:
         self.step = 0
         self.tracer = tracer
         self.pedestrian_position_limit = {
-            'min_x': tracer.min_bound[0],
-            'max_x': tracer.max_bound[0],
+            'min_x': -100,
+            'max_x': 100,
             'min_y': 0.5,
             'max_y': 1.8,
-            'min_z': tracer.min_bound[2],
-            'max_z': tracer.max_bound[2],
+            'min_z': -100,
+            'max_z': 100,
         }
         self.cell_position_limit = {
-            'min_x': tracer.min_bound[0],
-            'max_x': tracer.max_bound[0],
-            'min_y': 2,
-            'max_y': tracer.max_bound[1],
-            'min_z': tracer.min_bound[2],
-            'max_z': tracer.max_bound[2],
+            'min_x': -50,
+            'max_x': 50,
+            'min_y': 5,
+            'max_y': 20,
+            'min_z': -50,
+            'max_z': 50,
             'min_tx': 15,
             'max_tx': 20
         }
         self.cells, self.pedestrians = [], []
-        self.generate_cell_randomly(pedestrian_n)
-        self.generate_pedestrian_randomly(cell_n)
+        print(f'cell_N {cell_n}, pedestrian_N {pedestrian_n}')
+        self.generate_cell_randomly(cell_n)
+        self.generate_pedestrian_randomly(pedestrian_n)
 
     def generate_cell_randomly(self, cell_n):
         for i in range(cell_n):
@@ -65,21 +67,23 @@ class OldtownWalk:
                 outdoor = True
         return new_position
 
-    def repurpose_pedestrian(self):
+    def repurpose_pedestrian(self, max_try=5):
         for pedestrian in self.pedestrians:
             if not pedestrian.walking:
                 found = False
                 try_count = 0
-                while not found:
+                while not found and try_count < max_try:
                     try_count += 1
                     new_destination = self.random_outdoor_position(self.pedestrian_position_limit)
                     if self.tracer.direct_path(pedestrian.position, new_destination):
                         pedestrian.destination = new_destination
+                        pedestrian.walking = True
                         found = True
         return
 
     def update(self, delta_time):
-        for pedestrian in self.pedestrians:
+        self.repurpose_pedestrian()
+        for pedestrianId, pedestrian in enumerate(self.pedestrians):
             pedestrian.walk(delta_time)
 
     def get_impulse_list(self):
@@ -104,3 +108,13 @@ class OldtownWalk:
                 cell_result['pedestrians'].append(pedestrian_result)
             cell_results.append(cell_result)
         return cell_results
+
+    def get_results(self):
+        results = []
+        for cell in self.cells:
+            tx_pos = cell.transmitter.position
+            for pedestrian in self.pedestrians:
+                rx_pos = pedestrian.receiver.position
+                result = self.tracer.trace_outdoor(tx_pos, rx_pos)
+                results.append(result)
+        return results

@@ -21,10 +21,9 @@ class Pedestrian:
     def walk(self, delta_time):
         if not self.walking:
             return
-
-        direction = VecNorm(self.position - self.destination)
+        direction = VecNorm(self.destination - self.position)
         step_distance = self.speed * delta_time
-        self.position += direction * self.speed * step_distance
-
+        self.position = self.position + direction * step_distance
+        self.receiver.position = self.position
         if VecDistance(self.position, self.destination) <= step_distance:
             self.walking = False

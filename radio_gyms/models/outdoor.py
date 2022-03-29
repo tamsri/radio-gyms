@@ -3,7 +3,7 @@ from typing import List, Tuple
 import numpy as np
 
 from ..utils import VecDistance, RefAngle, VecNorm, VecAngle, SortPointsFromPlaneY, dBmTomW, mWTodBm
-from ..utils.constants import LIGHT_SPEED
+from ..utils.constants import LIGHT_SPEED, EPSILON
 
 
 class TheoreticalOutdoorModel:
@@ -29,17 +29,11 @@ class TheoreticalOutdoorModel:
         return 10 * np.log10(space_loss)
 
     @staticmethod
-    def calculate_single_reflection_loss(tx_pos, rx_pos, ref_pos, frequency,
-                                         tx_medium_permittivity=1,
-                                         ref_medium_permittivity=5.31,
-                                         polar='TM',
-                                         wave_speed=LIGHT_SPEED):
-        tx_pos = np.array(tx_pos)
-        rx_pos = np.array(rx_pos)
-        ref_pos = np.array(ref_pos)
-        # calculate coefficient
+    def calculate_reflection_coefficient(tx_pos, rx_pos, ref_pos,
+                                         tx_medium_permittivity,
+                                         ref_medium_permittivity,
+                                         polar):
         assert polar == 'TM' or polar == 'TE'
-
         angle_1 = RefAngle(tx_pos, ref_pos, rx_pos)
         angle_2 = np.arcsin(np.sqrt(tx_medium_permittivity) * np.sin(angle_1) / np.sqrt(ref_medium_permittivity))
         bias = np.sqrt(np.abs(tx_medium_permittivity / ref_medium_permittivity) * np.sin(angle_1))
@@ -56,10 +50,50 @@ class TheoreticalOutdoorModel:
                 coefficient = (sqrt_n1 * cos_1 - sqrt_n2 * cos_2) / (sqrt_n1 * cos_1 + sqrt_n2 * cos_2)
             else:
                 raise TypeError("invalid polar")
+        return coefficient
+
+    @staticmethod
+    def calculate_single_reflection_loss(tx_pos, rx_pos, ref_pos, frequency,
+                                         tx_medium_permittivity=1,
+                                         ref_medium_permittivity=5.31,
+                                         polar='TM',
+                                         wave_speed=LIGHT_SPEED):
+        tx_pos = np.array(tx_pos)
+        rx_pos = np.array(rx_pos)
+        ref_pos = np.array(ref_pos)
+        # calculate coefficient
+        coefficient = TheoreticalOutdoorModel.calculate_reflection_coefficient(tx_pos, rx_pos, ref_pos,
+                                                                               tx_medium_permittivity,
+                                                                               ref_medium_permittivity,
+                                                                               polar)
         # calculate loss
         distance = VecDistance(tx_pos, ref_pos) + VecDistance(ref_pos, rx_pos)
         wave_length = wave_speed / frequency
         loss = (4 * np.pi * distance / (coefficient * wave_length)) ** 2
+        return 10 * np.log10(loss)
+
+    @staticmethod
+    def calculate_double_reflection_loss(tx_pos, rx_pos, ref1_pos, ref2_pos, frequency,
+                                         tx_medium_permittivity=1,
+                                         ref_medium_permittivity=5.31,
+                                         polar='TM',
+                                         wave_speed=LIGHT_SPEED):
+        tx_pos = np.array(tx_pos)
+        rx_pos = np.array(rx_pos)
+        ref1_pos = np.array(ref1_pos)
+        ref2_pos = np.array(ref2_pos)
+        coefficient_1 = TheoreticalOutdoorModel.calculate_reflection_coefficient(tx_pos, ref2_pos, ref1_pos,
+                                                                                 tx_medium_permittivity,
+                                                                                 ref_medium_permittivity,
+                                                                                 polar)
+        polar_2 = 'TE' if polar == 'TM' else 'TM'
+        coefficient_2 = TheoreticalOutdoorModel.calculate_reflection_coefficient(ref1_pos, rx_pos, ref2_pos,
+                                                                                 tx_medium_permittivity,
+                                                                                 ref_medium_permittivity,
+                                                                                 polar_2)
+        distance = VecDistance(tx_pos, ref1_pos) + VecDistance(ref1_pos, ref2_pos) + VecDistance(ref2_pos, rx_pos)
+        wave_length = wave_speed / frequency
+        loss = (4 * np.pi * distance / (coefficient_1 * coefficient_2 * wave_length)) ** 2
         return 10 * np.log10(loss)
 
     @staticmethod
@@ -81,7 +115,7 @@ class TheoreticalOutdoorModel:
             s_1 = np.cos(angle_tx) * r_1
             s_2 = np.cos(angle_rx) * r_2
             h = np.sin(angle_tx) * r_1
-            return h * np.sqrt((2 * (s_1 + s_2)) / (wave_length * r_1 * r_2))
+            return h * np.sqrt((2 * (s_1 + s_2)) / (wave_length * r_1 * r_2 + EPSILON))
 
         def calculate_c(v: float):
             return 6.9 + 20 * np.log10(np.sqrt((v - 0.1) ** 2 + 1) + v - 0.1)
@@ -213,6 +247,15 @@ class TheoreticalOutdoorModel:
             reflected_received_power_dbm = self.tx_power_dBm - reflected_loss
             receive_power_dbms.append(reflected_received_power_dbm)
 
+        for ref_positions in self.result['reflections']['double']:
+            ref1_pos = ref_positions[0]
+            ref2_pos = ref_positions[1]
+            reflected_loss = TheoreticalOutdoorModel.calculate_double_reflection_loss(tx_pos, rx_pos, ref1_pos,
+                                                                                      ref2_pos, frequency,
+                                                                                      wave_speed=wave_speed)
+            reflected_received_power_dbm = self.tx_power_dBm - reflected_loss
+            receive_power_dbms.append(reflected_received_power_dbm)
+
         received_power_mw = 0
         for receive_power_dbm in receive_power_dbms:
             received_power_mw += dBmTomW(receive_power_dbm)
@@ -246,7 +289,8 @@ class TheoreticalOutdoorModel:
             rev_power_dbm = self.tx_power_dBm - self.calculate_free_space_loss(tx_pos, rx_pos, freq, wave_speed)
             rev_delay = self.calculate_signal_delay(tx_pos, rx_pos)
             impulse = {'strength': rev_power_dbm,
-                       'delay': rev_delay}
+                       'delay': rev_delay,
+                       'origin': 'direct'}
             impulses.append(impulse)
         else:
             knife_edges = self.result['roof_edges']
@@ -258,7 +302,8 @@ class TheoreticalOutdoorModel:
             rev_power_dbm = self.tx_power_dBm - diffraction_loss
             rev_delay = self.calculate_signal_delay(tx_pos, rx_pos, knife_edges)
             impulse = {'strength': rev_power_dbm,
-                       'delay': rev_delay}
+                       'delay': rev_delay,
+                       'origin': 'diffraction'}
             impulses.append(impulse)
         for ref_pos in self.result['reflections']['single']:
             reflected_loss = TheoreticalOutdoorModel.calculate_single_reflection_loss(tx_pos,
@@ -269,6 +314,23 @@ class TheoreticalOutdoorModel:
             rev_power_dbm = self.tx_power_dBm - reflected_loss
             rev_delay = self.calculate_signal_delay(tx_pos, rx_pos, [ref_pos])
             impulse = {'strength': rev_power_dbm,
-                       'delay': rev_delay}
+                       'delay': rev_delay,
+                       'origin': 'single reflection'}
             impulses.append(impulse)
+        for ref_positions in self.result['reflections']['double']:
+            ref1_pos = ref_positions[0]
+            ref2_pos = ref_positions[1]
+            reflected_loss = TheoreticalOutdoorModel.calculate_double_reflection_loss(tx_pos,
+                                                                                      rx_pos,
+                                                                                      ref1_pos,
+                                                                                      ref2_pos,
+                                                                                      freq,
+                                                                                      wave_speed=wave_speed)
+            rev_power_dbm = self.tx_power_dBm - reflected_loss
+            rev_delay = self.calculate_signal_delay(tx_pos, rx_pos, [ref1_pos, ref2_pos])
+            impulse = {'strength': rev_power_dbm,
+                       'delay': rev_delay,
+                       'origin': 'double reflection'}
+            impulses.append(impulse)
+
         return impulses
