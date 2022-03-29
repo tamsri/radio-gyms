@@ -2,7 +2,9 @@
 
 ![Radio Gyms](https://github.com/intelek-ai/radio-gyms/blob/master/assets/logo.png)
 
-Radio Gyms is an open-source bundle of AI environments for radio communications. The simulations are composed of Open AI Gym and various theoretical radio propagation models, specifically for AI research in telecommunications. 
+Radio Gyms is an open-source bundle of AI environments for radio communications. 
+The simulations are built for AI gyms with the support of radio-related calculation modules, and theoretical radio propagation models to simulate an accurate prediction, 
+specifically to perform reinforcement learning algorithms.
 
 ## Installation
 ### PyPi Package via pip
@@ -23,8 +25,9 @@ rm -rf radio_gyms
 * pyglet
 * pywavefront
 ## Features
+Radio gyms provides the toolkit for building wireless communication simulations including modules can be called to build and 
+customize the radio propagation simulation. 
 ### 1. Calling Primitive Ray Tracer for Outdoor Propagation
-Radio gyms provides the toolkit for building wireless communication simulations. 
 The ray tracer can be called for computing the radio propagation paths in the following example.
 ```python
 from radio_gyms.engines import Tracer
@@ -47,6 +50,9 @@ result = tracer.trace_outdoor(tx_pos, rx_pos)
 # )]}
 ```
 ### 2. Calculate the traced result with the theoretical outdoor model
+The result from the ray tracer can be calculated by the propagation models in ```radio_gyms.models```. 
+In this example, ```TheoreticalOutdoorModel``` can compute the traced results to predict the signal strength 
+and delay between the receiver and transmitter based on the theoretical radio propagation models.
 ```python
 from radio_gyms.models import TheoreticalOutdoorModel
 result = {
@@ -66,6 +72,49 @@ impulses = model.calculate_signal_impulses(freq=5.4e9)
 # {'strength': -74.3214622218488, 'delay': 2.910702009034143e-07}, 
 # {'strength': -77.80902883055407, 'delay': 4.125241781539828e-07}]
 ```
+### 3. Visualize the scene and radio propagation paths
+```python
+from radio_gyms.engines.ray_tracer.tracer import Tracer
+from radio_gyms.visualizers import Window
+from radio_gyms.utils.converters import outdoor_traced_result_to_line as OutdoorResultToLines
+from radio_gyms.simulations import OldtownWalk
+
+MAP_OBJ_PATH = "./city.obj"
+
+window = Window()
+window.load_obj_to_scene(MAP_OBJ_PATH)
+tracer = Tracer(MAP_OBJ_PATH, ref_max=2) # ref_max == max reflection tracing
+simulation = OldtownWalk(tracer, 1, 5)
+# Run 100 episodes
+for i in range(100):
+    simulation.update(1) # update time in the simulation by 1 second
+    results = simulation.get_results() # get result from simulation
+    window.line_sets = []
+    # convert the results to lines for visualizing in window
+    for result in results:
+        result_lines = OutdoorResultToLines(result, result['tx_pos'], result['rx_pos'])
+        window.line_sets += result_lines
+    # render the scene    
+    window.render()
+    window.dispatch_events()
+```
+![Old Town Simulation's Visualization](https://github.com/intelek-ai/radio-gyms/blob/master/assets/examples/oldtown.png)
+
+## Gyms
+### 1. ```radio-gym-01``` : Cooperative Small Cell Power Switching (Coming soon, V1.0.0)
+- #### Environment
+The environment consists of mobile UEs as pedestrians walk in the old town and multiple small cells.
+The small cells can sense the signal strength and delay of pedestrians where UEs only connect to the cell which provides the
+strongest signal. 
+- #### Reward
+The reward is considered for average connected signal strength of all UEs to cells, the average signal-to-noise (SNR) of UEs 
+between connected cell and disconnected cell, and the consumption transmitting power. 
+- #### Action
+Each cell can control its own transmitting power.
+
+### 2. ```radio-gym-02```: Beamformer by antenna node control (Expected in v1.5)
+
+
 ## Documentation
 Radio Gyms provides radio propagation engines and tools for customizations.
 The official documentation can be found at ***[radio-gyms.intelek.ai](https://radio-gyms.intelek.ai)***
@@ -92,9 +141,10 @@ The official documentation can be found at ***[radio-gyms.intelek.ai](https://ra
 
 [//]: # (```)
 
-## Community
+## Community 
 Feel free to suggest an idea or contribute with us.
 * [Discord](https://discord.gg/Rp2KhXcpPh)
+
 
 ## Road Map
 - [x] v0.1.x - Radio Ray Tracer
@@ -104,7 +154,7 @@ Feel free to suggest an idea or contribute with us.
 - [ ] v0.5.x - Visualization for notebook
 - [ ] v0.6.x - Outdoor Simulation
 - [ ] v0.9.x - Official Documentations
-- [ ] v1.0.0 - Radio Gym 01: Beam Steering
+- [ ] v1.0.0 - Radio Gym 01: Cooperative Small Cell Power Switching
 - [ ] v1.5.0 - Radio Gym 02: Beam-forming Control by Antenna Array
 - [ ] v2.x.x - FDTD Model
 - [ ] v3.1.0 - Radio Gym 03: Indoor Environment

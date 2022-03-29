@@ -30,7 +30,6 @@ class TestVirtualizer(TestCase):
         for i in range(1000):
             window.render()
             window.dispatch_events()
-            print(i)
 
     def test_visual_oldtown(self):
         window = Window()
