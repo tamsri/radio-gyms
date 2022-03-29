@@ -8,7 +8,7 @@ POZNAN_OBJ_PATH = os.path.join(os.getcwd(), "assets", "models", "poznan.obj")
 
 class TestOldtownWalkSimulation(TestCase):
     def test_impulse(self):
-        tracer = Tracer(POZNAN_OBJ_PATH)
+        tracer = Tracer(POZNAN_OBJ_PATH, ref_max=1)
         simulation = OldtownWalk(tracer, 1, 30)
 
         simulation.update(1)

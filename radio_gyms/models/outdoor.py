@@ -3,7 +3,7 @@ from typing import List, Tuple
 import numpy as np
 
 from ..utils import VecDistance, RefAngle, VecNorm, VecAngle, SortPointsFromPlaneY, dBmTomW, mWTodBm
-from ..utils.constants import LIGHT_SPEED
+from ..utils.constants import LIGHT_SPEED, EPSILON
 
 
 class TheoreticalOutdoorModel:
@@ -115,7 +115,7 @@ class TheoreticalOutdoorModel:
             s_1 = np.cos(angle_tx) * r_1
             s_2 = np.cos(angle_rx) * r_2
             h = np.sin(angle_tx) * r_1
-            return h * np.sqrt((2 * (s_1 + s_2)) / (wave_length * r_1 * r_2))
+            return h * np.sqrt((2 * (s_1 + s_2)) / (wave_length * r_1 * r_2 + EPSILON))
 
         def calculate_c(v: float):
             return 6.9 + 20 * np.log10(np.sqrt((v - 0.1) ** 2 + 1) + v - 0.1)
