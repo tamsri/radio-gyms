@@ -8,3 +8,4 @@ from .calculations import calculate_reflection_angle as RefAngle
 from .converters import outdoor_traced_result_to_line as OutdoorResultToLines
 from .converters import dbm_to_mw as dBmTomW
 from .converters import mw_to_dbm as mWTodBm
+from .notebook import is_notebook as IsNotebook
