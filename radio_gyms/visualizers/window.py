@@ -30,7 +30,7 @@ class VisualizerWindow(Window):
                  camera_rotation=[33, -230, 0],
                  resizable=True,
                  background_color=[0,0,0,1],
-                 zoom = 66):
+                 zoom = 50):
         
         self.window_size = window_size
         self.camera_position = camera_position
@@ -113,7 +113,7 @@ class VisualizerWindow(Window):
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
         gluPerspective(self.zoom, self.window_size[0] /
-                       float(self.window_size[1]), .1, 1000)
+                       float(self.window_size[1]), .2, 1000)
         glMatrixMode(GL_MODELVIEW)
         glDrawArrays(GL_TRIANGLES, 0, 3)
         glLoadIdentity()

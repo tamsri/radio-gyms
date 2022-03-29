@@ -15,7 +15,7 @@ def outdoor_traced_result_to_line(result, tx_pos, rx_pos) -> List[List]:
         if 'single' in result['reflections']:
             for reflect_point in result['reflections']['single']:
                 line = {'points': [tx_pos, reflect_point, rx_pos], 'color': [0, 0, 0.7, 1.0]}
-                # lines.append(line)
+                lines.append(line)
         if 'double' in result['reflections']:
             for reflect_points in result['reflections']['double']:
                 line = {'points': [tx_pos] + reflect_points + [rx_pos], 'color': [0.3, .3, 0.75, 1.0]}
