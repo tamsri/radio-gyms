@@ -27,9 +27,7 @@ class TestVirtualizer(TestCase):
             lines = lines + OutdoorResultToLines(result, tx_pos, rx_pos)
         window.line_sets = lines
         window.load_obj_to_scene(POZNAN_OBJ_PATH)
-        for i in range(1000):
-            window.render()
-            window.dispatch_events()
+        window.run()
 
     def test_visual_oldtown(self):
         window = Window()

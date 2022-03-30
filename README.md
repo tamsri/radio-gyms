@@ -72,7 +72,34 @@ impulses = model.calculate_signal_impulses(freq=5.4e9)
 # {'strength': -74.3214622218488, 'delay': 2.910702009034143e-07}, 
 # {'strength': -77.80902883055407, 'delay': 4.125241781539828e-07}]
 ```
-### 3. Visualize the scene and radio propagation paths
+### 3. Visualize the data with window 
+As we obtain the traced paths from the tracer, we can convert these paths into lines for the visualization. 
+```Window()``` can be called to read the lines and the scene to visualize the scene in 3D by ```window.run()```.
+```python
+import numpy as np
+from radio_gyms.visualizers import Window
+from radio_gyms.engines.ray_tracer.tracer import Tracer
+from radio_gyms.utils import OutdoorResultToLines
+
+MAT_OBJ_PATH = "./city.obj
+
+window = Window()
+window.load_obj_to_scene(MAT_OBJ_PATH)
+tracer = Tracer(MAT_OBJ_PATH)
+tx_pos = np.array([0, 5, 0])
+lines = []
+while True:
+    rx_pos = (np.random.rand(3)*2-1)*100
+    rx_pos[1] = 1.2
+    if tracer.is_outdoor(rx_pos):
+        break
+result = tracer.trace_outdoor(tx_pos, rx_pos)
+lines = lines + OutdoorResultToLines(result, tx_pos, rx_pos)
+window.line_sets = lines
+window.run()
+```
+### 4. Visualize the scene and radio propagation paths for a simulation
+```window.render()``` can be called to visualize the simulation frame as the simulation updates the components. 
 ```python
 from radio_gyms.engines.ray_tracer.tracer import Tracer
 from radio_gyms.visualizers import Window
@@ -152,7 +179,7 @@ Feel free to suggest an idea or contribute with us.
 - [x] v0.3.x - Transmitter and Receiver Controller
 - [x] v0.4.x - Visualization for desktop
 - [ ] v0.5.x - Visualization for notebook
-- [ ] v0.6.x - Outdoor Simulation
+- [x] v0.6.x - Outdoor Simulation
 - [ ] v0.9.x - Official Documentations
 - [ ] v1.0.0 - Radio Gym 01: Cooperative Small Cell Power Switching
 - [ ] v1.5.0 - Radio Gym 02: Beam-forming Control by Antenna Array

@@ -42,6 +42,7 @@ class VisualizerWindow(Window):
         self.clear_color = background_color
         self.line_sets = []
         self.scenes = []
+        self.spheres = [] # TODO: Add sphere
         self.refresh_rate = 30
         super().__init__(width=window_size[0],
                          height=window_size[1],
