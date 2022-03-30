@@ -34,7 +34,7 @@ class TestVirtualizer(TestCase):
         window.load_obj_to_scene(POZNAN_OBJ_PATH)
         tracer = Tracer(POZNAN_OBJ_PATH, ref_max=1)
         simulation = OldtownWalk(tracer, 1, 5)
-        for i in range(1000):
+        for i in range(10):
             simulation.update(3)
             results = simulation.get_results()
             window.line_sets = []
@@ -43,3 +43,13 @@ class TestVirtualizer(TestCase):
                 window.line_sets += result_lines
             window.render()
             window.dispatch_events()
+
+    def test_window_move(self):
+        window = Window()
+        window.load_obj_to_scene(POZNAN_OBJ_PATH)
+        tracer = Tracer(POZNAN_OBJ_PATH, ref_max=2)
+        simulation = OldtownWalk(tracer, 1, 10)
+        results = simulation.get_results()
+        for result in results:
+            window.line_sets += OutdoorResultToLines(result, result['tx_pos'], result['rx_pos'])
+        window.run()

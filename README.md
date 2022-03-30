@@ -98,7 +98,10 @@ lines = lines + OutdoorResultToLines(result, tx_pos, rx_pos)
 window.line_sets = lines
 window.run()
 ```
-### 4. Visualize the scene and radio propagation paths for a simulation
+With the ```.run()``` The camera can be moved by ```W```  ```A```  ```S```  ```D``` keys and rotated by ```Q``` ```E```.
+![Old Town's Visualization](https://github.com/intelek-ai/radio-gyms/blob/master/assets/examples/oldtown_freeze.gif)
+
+### 4. Visualize the scene and radio propagation paths during running a simulation
 ```window.render()``` can be called to visualize the simulation frame as the simulation updates the components. 
 ```python
 from radio_gyms.engines.ray_tracer.tracer import Tracer
@@ -147,31 +150,17 @@ Radio Gyms provides radio propagation engines and tools for customizations.
 The official documentation can be found at ***[radio-gyms.intelek.ai](https://radio-gyms.intelek.ai)***
 
 ## Contributors
-- [Supawat Tamsri](https://github.com/tamsri)
-- [Muhammad Aamir Khan](https://scholar.google.com/citations?user=Q7YdzQEAAAAJ)
-- [Krzysztof Cichoń](https://scholar.google.com/citations?user=GmzK3-oAAAAJ)
-
-[//]: # (## Citation)
-
-[//]: # ()
-[//]: # (```)
-
-[//]: # (@article{)
-
-[//]: # (	title={Radio Gyms : Radio Communication Simulations for Intelligent Agents},)
-
-[//]: # (	author={Supawat Tamsri, Muhammad Aamir Khan, Krzysztof Cichoń},)
-
-[//]: # (	year={2022})
-
-[//]: # (})
-
-[//]: # (```)
+- [Supawat Tamsri](https://github.com/tamsri), supawat@intelek.ai
+  - Founds and develops.
+- [Muhammad Aamir Khan](https://scholar.google.com/citations?user=Q7YdzQEAAAAJ), aamir@intelek.ai
+  - Supervises on machine learning research and AI environments.
+- [Prof. Eng. Krzysztof Cichoń](https://scholar.google.com/citations?user=GmzK3-oAAAAJ), krzysztof.cichon@put.poznan.pl
+  - Supervises on radio propagation and channel modelling features.
+  - Validates and verifies theoretical models and simulated results.
 
 ## Community 
-Feel free to suggest an idea or contribute with us.
+Feel free to suggest an environment idea or contribute with us.
 * [Discord](https://discord.gg/Rp2KhXcpPh)
-
 
 ## Road Map
 - [x] v0.1.x - Radio Ray Tracer
