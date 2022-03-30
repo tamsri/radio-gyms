@@ -149,6 +149,19 @@ Each cell can control its own transmitting power.
 Radio Gyms provides radio propagation engines and tools for customizations.
 The official documentation can be found at ***[radio-gyms.intelek.ai](https://radio-gyms.intelek.ai)***
 
+## Citations
+The pre-released source code can be cited with the following bibtex entry.
+```text
+@misc{radiogyms2022,
+  author = {Supawat Tamsri},
+  title = {Radio Gyms},
+  year = {2022},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/intelek-ai/radio-gyms}},
+}
+```
+
 ## Contributors
 - [Supawat Tamsri](https://github.com/tamsri), supawat@intelek.ai
   - Founds and develops.
