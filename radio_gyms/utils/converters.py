@@ -11,7 +11,7 @@ def outdoor_traced_result_to_line(result) -> List[List]:
         lines.append(line)
     else:
         if len(result['roof_edges']) > 0:
-            line = {'points': [tx_pos] + result['roof_edges'] + [rx_pos], 'color': [0.2, 0.2, 0.2, 1]}
+            line = {'points': [tx_pos] + result['roof_edges'] + [rx_pos], 'color': [0.2, 0.2, 0.6, 1]}
             lines.append(line)
 
     if 'reflections' in result:

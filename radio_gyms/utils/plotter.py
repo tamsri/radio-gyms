@@ -19,7 +19,8 @@ class Plotter:
         if self.terrain_map is not None:
             display_map = self.terrain_map.pivot('x', 'z', 'height')
             display_map = display_map.T
-            plt.imshow(display_map, cmap='inferno', interpolation='nearest', extent=[x_min, x_max, z_min, z_max])
+            plt.imshow(display_map, cmap='inferno', interpolation='nearest', extent=[x_min, x_max,
+                                                                                     z_min, z_max])
             plt.colorbar()
             plt.axis('off')
         rx_x = []
@@ -38,9 +39,12 @@ class Plotter:
             first_point = points[0]
             for line_point in points[1:]:
                 second_point = line_point
-                x1 = [first_point[0], first_point[2] * -1]
-                x2 = [second_point[0], second_point[2] * -1]
-                plt.plot(x1, x2)
+                x_1, z_1 = first_point[0], first_point[2] * -1
+                x_2, z_2 = second_point[0], second_point[2] * -1
+                print(color)
+                plt.plot([x_1, x_2], [z_1, z_2], color=color)
+
+                first_point = line_point
         plt.scatter(rx_x, rx_z, c='blue')
         plt.scatter(tx_x, tx_z, c='red')
         plt.xlim(x_min, x_max)
