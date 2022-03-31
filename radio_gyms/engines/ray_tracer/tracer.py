@@ -2,6 +2,7 @@ from typing import Tuple, List, Dict
 from numpy.typing import NDArray
 
 import numpy as np
+import pandas as pd
 
 from ..ray_tracer.obj_reader import ObjToTriangles
 from ...utils import VecNorm, VecDistance, VecAngle, PosBetweenXZ, SortPointsFromPlaneY
@@ -13,7 +14,8 @@ class Tracer:
     min_bound = None
     max_bound = None
     ref_max = None
-    def __init__(self, object_file_path, ref_max = 2):
+
+    def __init__(self, object_file_path, ref_max=2):
         """
         Initialize Map for Ray Tracer
         :param object_file_path:
@@ -23,6 +25,7 @@ class Tracer:
         self.min_bound = self.map.root.min_bound
         self.max_bound = self.map.root.max_bound
         self.ref_max = ref_max
+
     def trace_outdoor(self, tx_pos: List[float], rx_pos: List[float]):
         """
         Trace the possible ray paths from tx_pos to rx_pos in outdoor scenario (open sky)
@@ -97,7 +100,7 @@ class Tracer:
 
     def trace_single_reflect(self, tx_pos, rx_pos) -> List[NDArray]:
         if self.ref_max < 1:
-            return  []
+            return []
         single_reflections = []
         for triangle in self.map.root.triangles:
             mirror_point = Tracer.get_mirror_point(tx_pos, triangle)
@@ -238,3 +241,24 @@ class Tracer:
         sky_pos = np.copy(pos)
         sky_pos[1] = 1000
         return self.direct_path(pos, sky_pos)
+
+    def terrain_height(self, x: float, z: float):
+        upper = np.array([x, 1000, z])
+        lower_ray = (upper, np.array([0, -1, 0]))
+        nearest_hit = self.map.is_intersect(lower_ray)
+        if nearest_hit == -1:
+            return 0
+        return 1000 - nearest_hit
+
+    def get_terrain_depth(self, x_n, z_n):
+        x_min, x_max = self.min_bound[0], self.max_bound[2]
+        z_min, z_max = self.min_bound[0], self.max_bound[2]
+        assert x_min < x_max
+        assert z_min < z_max
+        depth_map = []
+        for x in np.linspace(x_min, x_max, x_n):
+            for z in np.linspace(z_min, z_max, z_n):
+                height = self.terrain_height(x, z)
+                if height != -1:
+                    depth_map.append({'x': x, 'z': z, 'height': height})
+        return pd.DataFrame(depth_map)

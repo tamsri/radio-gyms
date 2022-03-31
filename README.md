@@ -122,7 +122,7 @@ for i in range(100):
     window.line_sets = []
     # convert the results to lines for visualizing in window
     for result in results:
-        result_lines = OutdoorResultToLines(result, result['tx_pos'], result['rx_pos'])
+        result_lines = OutdoorResultToLines(result)
         window.line_sets += result_lines
     # render the scene    
     window.render()

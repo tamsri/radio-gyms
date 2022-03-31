@@ -1,1 +1,1 @@
-from .outdoor import TheoreticalOutdoorModel
+from .theoretical import TheoreticalOutdoorModel

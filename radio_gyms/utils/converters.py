@@ -1,7 +1,10 @@
 from typing import List
 import numpy as np
 
-def outdoor_traced_result_to_line(result, tx_pos, rx_pos) -> List[List]:
+
+def outdoor_traced_result_to_line(result) -> List[List]:
+    tx_pos = result['tx_pos']
+    rx_pos = result['rx_pos']
     lines = []
     if result['direct']:
         line = {'points': [tx_pos, rx_pos], 'color': [0, 0.8, 0, 1]}
@@ -22,8 +25,10 @@ def outdoor_traced_result_to_line(result, tx_pos, rx_pos) -> List[List]:
                 lines.append(line)
     return lines
 
+
 def dbm_to_mw(dbm_value: float) -> float:
-    return 10**(dbm_value/10)
+    return 10 ** (dbm_value / 10)
+
 
 def mw_to_dbm(mw_value: float) -> float:
-    return 10*np.log10(mw_value)
+    return 10 * np.log10(mw_value)

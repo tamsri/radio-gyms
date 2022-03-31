@@ -1,8 +1,8 @@
 from time import sleep
 from pyglet.window import Window, key
-from pyglet.gl import glClearColor, glBegin, glEnd, GL_LINE_STRIP,\
-    glVertex3f, glColor4f, glLineWidth, glMatrixMode, GL_PROJECTION,\
-    glLoadIdentity, gluPerspective, GL_MODELVIEW, glTranslatef, glRotatef,\
+from pyglet.gl import glClearColor, glBegin, glEnd, GL_LINE_STRIP, \
+    glVertex3f, glColor4f, glLineWidth, glMatrixMode, GL_PROJECTION, \
+    glLoadIdentity, gluPerspective, GL_MODELVIEW, glTranslatef, glRotatef, \
     glEnable, GL_DEPTH_TEST, glDrawArrays, GL_TRIANGLES, glPushMatrix
 import logging
 from pywavefront import visualization, Wavefront, configure_logging
@@ -11,6 +11,7 @@ configure_logging(
     logging.ERROR,
     formatter=logging.Formatter('%(name)s-%(levelname)s: %(message)s')
 )
+
 
 class VisualizerWindow(Window):
     camera_position = None
@@ -22,16 +23,17 @@ class VisualizerWindow(Window):
     alive = False
     pressed_keys = {}
     zoom = 0
-    clear_color = (0,0,0,1)
+    clear_color = (0, 0, 0, 1)
     line_sets = []
     scenes = []
-    def __init__(self, title = "Radio Gyms", window_size = (600, 400),
-                 camera_position=[0 , 0, -255],
+
+    def __init__(self, title="Radio Gyms", window_size=(600, 400),
+                 camera_position=[0, 0, -255],
                  camera_rotation=[33, -230, 0],
                  resizable=True,
-                 background_color=[0,0,0,1],
-                 zoom = 50):
-        
+                 background_color=[0, 0, 0, 1],
+                 zoom=50):
+
         self.window_size = window_size
         self.camera_position = camera_position
         self.camera_rotation = camera_rotation
@@ -42,12 +44,12 @@ class VisualizerWindow(Window):
         self.clear_color = background_color
         self.line_sets = []
         self.scenes = []
-        self.spheres = [] # TODO: Add sphere
+        self.spheres = []  # TODO: Add sphere
         self.refresh_rate = 30
         super().__init__(width=window_size[0],
                          height=window_size[1],
-                         resizable = resizable,
-                         caption = title,
+                         resizable=resizable,
+                         caption=title,
                          style=Window.WINDOW_STYLE_DIALOG)
         glClearColor(0.9, 0.9, 0.875, 1)
 
@@ -133,4 +135,4 @@ class VisualizerWindow(Window):
         while self.alive:
             self.render()
             event = self.dispatch_events()
-            sleep(1.0/self.refresh_rate)
+            sleep(1.0 / self.refresh_rate)
