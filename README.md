@@ -130,6 +130,29 @@ for i in range(100):
 ```
 ![Old Town Simulation's Visualization](https://github.com/intelek-ai/radio-gyms/blob/master/assets/examples/oldtown.gif)
 
+### 5. Visualize the scene and radio propagation paths on notebook
+Radio gyms can be visualized on a notebook in 2D by using ```utils.Plotter```. 
+```Plotter()``` requires definition of boundary of the map to visualize. The parameters such as points and lines can be passed to Plotter to visualize the data.
+
+```python
+from radio_gyms.engines import Tracer
+from radio_gyms.utils import Plotter, OutdoorResultToLines
+MAP_SCENE = "./city.obj"
+
+tracer = Tracer(MAP_SCENE)
+rx = [0, 1.2, 0]
+tx = [-50, 4, 40]
+result = tracer.trace_outdoor(tx, rx)
+terrain_map = tracer.get_terrain_depth(64, 64)
+plotter = Plotter( tracer.min_bound, tracer.max_bound, terrain_map)
+plotter.rx_pos.append(rx)
+plotter.tx_pos.append(tx)
+plotter.lines =  OutdoorResultToLines(result)
+
+plotter.render_top() # Display from top view
+```
+![Old Town Simulation's Visualization on a notebook](https://github.com/intelek-ai/radio-gyms/blob/master/assets/examples/notebook-render.gif)
+
 ## Gyms
 ### 1. ```radio-gym-01``` : Cooperative Small Cell Power Switching (Coming soon, V1.0.0)
 - #### Environment
@@ -180,7 +203,7 @@ Feel free to suggest an environment idea or contribute with us.
 - [x] v0.2.x - Theoretical Outdoor Propagation Model
 - [x] v0.3.x - Transmitter and Receiver Controller
 - [x] v0.4.x - Visualization for desktop
-- [ ] v0.5.x - Visualization for notebook
+- [x] v0.5.x - Visualization for notebook
 - [x] v0.6.x - Outdoor Simulation
 - [ ] v0.9.x - Official Documentations
 - [ ] v1.0.0 - Radio Gym 01: Cooperative Small Cell Power Switching

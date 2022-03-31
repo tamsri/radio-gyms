@@ -41,7 +41,6 @@ class Plotter:
                 second_point = line_point
                 x_1, z_1 = first_point[0], first_point[2] * -1
                 x_2, z_2 = second_point[0], second_point[2] * -1
-                print(color)
                 plt.plot([x_1, x_2], [z_1, z_2], color=color)
 
                 first_point = line_point
