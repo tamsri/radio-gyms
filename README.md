@@ -151,7 +151,7 @@ plotter.lines =  OutdoorResultToLines(result)
 
 plotter.render_top() # Display from top view
 ```
-![Old Town Simulation's Visualization on a notebook](https://github.com/intelek-ai/radio-gyms/blob/master/assets/examples/notebook-render.png)
+![Old Town Simulation's Visualization on a notebook](https://github.com/intelek-ai/radio-gyms/blob/master/assets/examples/notebook_render.png)
 
 ## Gyms
 ### 1. ```radio-gym-01``` : Cooperative Small Cell Power Switching (Coming soon, V1.0.0)
