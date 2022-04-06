@@ -205,12 +205,12 @@ Feel free to suggest an environment idea or contribute with us.
 - [x] v0.4.x - Visualization for desktop
 - [x] v0.5.x - Visualization for notebook
 - [x] v0.6.x - Outdoor Simulation
-- [ ] v0.7.0 - Radio Gym 01: Base Station Location Planning
-- [ ] v0.8.0 - Radio Gym 02: UE Location Prediction
-- [ ] v0.9.0 - Radio Gym 03: Cooperative Small Cell Power Control
+- [ ] v0.7.x - Radio Gym 01: Base Station Location Planning
+- [ ] v0.8.x - Radio Gym 02: UE Location Prediction
+- [ ] v0.9.x - Radio Gym 03: Cooperative Small Cell Power Control
 - [ ] v0.9.5 - Beamforming Engine
-- [ ] v1.0.0 - Radio Gym 04: Intelligent Beamformer
-- [ ] v1.1.0 - FDTD Engine
+- [ ] v1.0.x - Radio Gym 04: Intelligent Beamformer
+- [ ] v1.1.x - FDTD Engine
 
 ## License
 
