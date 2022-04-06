@@ -25,7 +25,7 @@ class Tracer:
         self.min_bound = self.map.root.min_bound
         self.max_bound = self.map.root.max_bound
         self.ref_max = ref_max
-
+        
     def trace_outdoor(self, tx_pos: List[float], rx_pos: List[float]):
         """
         Trace the possible ray paths from tx_pos to rx_pos in outdoor scenario (open sky)

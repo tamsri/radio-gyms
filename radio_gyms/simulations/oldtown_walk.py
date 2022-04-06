@@ -13,7 +13,7 @@ class OldtownWalk:
     pedestrians: List[Pedestrian] = []
     step: int = 0
 
-    def __init__(self, tracer, cell_n, pedestrian_n):
+    def __init__(self, tracer, cell_n, pedestrian_n, gen_seed=0):
         self.step = 0
         self.tracer = tracer
         self.pedestrian_position_limit = {
@@ -35,7 +35,7 @@ class OldtownWalk:
             'max_tx': 20
         }
         self.cells, self.pedestrians = [], []
-        print(f'cell_N {cell_n}, pedestrian_N {pedestrian_n}')
+        self.rand_gen = np.random.default_rng(gen_seed)
         self.generate_cell_randomly(cell_n)
         self.generate_pedestrian_randomly(pedestrian_n)
 
@@ -56,11 +56,11 @@ class OldtownWalk:
     def random_outdoor_position(self, limit):
         outdoor = False
         while not outdoor:
-            random_x = np.random.uniform(low=limit['min_x'],
+            random_x = self.rand_gen.uniform(low=limit['min_x'],
                                          high=limit['max_x'], size=1)[0]
-            random_y = np.random.uniform(low=limit['min_y'],
+            random_y = self.rand_gen.uniform(low=limit['min_y'],
                                          high=limit['max_y'], size=1)[0]
-            random_z = np.random.uniform(low=limit['min_z'],
+            random_z = self.rand_gen.uniform(low=limit['min_z'],
                                          high=limit['max_z'], size=1)[0]
             new_position = np.array([random_x, random_y, random_z])
             if self.tracer.is_outdoor(new_position):

@@ -7,4 +7,5 @@ class Cell:
     position: NDArray = None
 
     def __init__(self, position, transmit_power):
+        self.position = position
         self.transmitter = Transmitter(position, transmit_power)
