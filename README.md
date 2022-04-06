@@ -205,13 +205,12 @@ Feel free to suggest an environment idea or contribute with us.
 - [x] v0.4.x - Visualization for desktop
 - [x] v0.5.x - Visualization for notebook
 - [x] v0.6.x - Outdoor Simulation
-- [ ] v0.9.x - Official Documentations
-- [ ] v1.0.0 - Radio Gym 01: Cooperative Small Cell Power Switching
-- [ ] v1.5.0 - Radio Gym 02: Beam-forming Control by Antenna Array
-- [ ] v2.x.x - FDTD Model
-- [ ] v3.1.0 - Radio Gym 03: Indoor Environment
-- [ ] v3.2.0 - Radio Gym 04: Complex Transmission Control
-
+- [ ] v0.7.0 - Radio Gym 01: Base Station Location Planning
+- [ ] v0.8.0 - Radio Gym 02: UE Location Prediction
+- [ ] v0.9.0 - Radio Gym 03: Cooperative Small Cell Power Control
+- [ ] v0.9.5 - Beamforming Engine
+- [ ] v1.0.0 - Radio Gym 04: Intelligent Beamformer
+- [ ] v1.1.0 - FDTD Engine
 
 ## License
 
