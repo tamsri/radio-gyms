@@ -1,16 +1,18 @@
-import numpy as np 
+import numpy as np
+
+from radio_gyms.models.theoretical import TheoreticalOutdoorModel 
 from .base import RadioGym
 from ..engines import Tracer
 from ..simulations import OldtownWalk
-
+from ..utils import dBmTomW
 class LocationGym(RadioGym):
     '''
     LocationGym simulates outdoor UEs uniformly generrated in an outdoor area.
     '''
 
-    def __init__(self, scene_path: str,  ue_n = 100, generator_seed = 0,):
+    def __init__(self, scene_path: str,  ue_n = 100, generator_seed = 0):
         super().__init__()
-        self.tracer = Tracer(scene_path)
+        self.tracer = Tracer(scene_path, ref_max=1)
         self.simulation = OldtownWalk(self.tracer, 2, ue_n, generator_seed)
         self.simulation.pedestrian_position_limit = {
             'min_x': self.tracer.min_bound[0],
@@ -32,7 +34,12 @@ class LocationGym(RadioGym):
     
     def calculate_avg_rec_power(self):
         results = self.simulation.get_results()
-        return results
+        avg_rev_power = 0
+        for result in results:
+            model = TheoreticalOutdoorModel(result, tx_power_dbm=15)
+            avg_rev_power += dBmTomW(model.calculate_max_received_power())
+        avg_rev_power /= len(result)
+        return avg_rev_power
 
     def step():
         pass
