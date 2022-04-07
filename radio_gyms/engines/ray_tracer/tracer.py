@@ -20,8 +20,8 @@ class Tracer:
         Initialize Map for Ray Tracer
         :param object_file_path:
         """
-        triangles = ObjToTriangles(object_file_path)
-        self.map = BVH(triangles)
+        self.triangles = ObjToTriangles(object_file_path)
+        self.map = BVH(self.triangles)
         self.min_bound = self.map.root.min_bound
         self.max_bound = self.map.root.max_bound
         self.ref_max = ref_max
@@ -55,6 +55,8 @@ class Tracer:
 
     @staticmethod
     def make_ray(tx_pos: NDArray, rx_pos: NDArray) -> Tuple[NDArray, NDArray]:
+        tx_pos = np.array(tx_pos)
+        rx_pos = np.array(rx_pos)
         ray_org: NDArray = tx_pos
         ray_dir: NDArray = VecNorm(rx_pos - tx_pos)
         ray = (ray_org, ray_dir)
