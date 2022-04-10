@@ -94,7 +94,7 @@ while True:
     if tracer.is_outdoor(rx_pos):
         break
 result = tracer.trace_outdoor(tx_pos, rx_pos)
-lines = lines + OutdoorResultToLines(result, tx_pos, rx_pos)
+lines = lines + OutdoorResultToLines(result)
 window.line_sets = lines
 window.run()
 ```
@@ -154,18 +154,9 @@ plotter.render_top() # Display from top view
 ![Old Town Simulation's Visualization on a notebook](https://github.com/intelek-ai/radio-gyms/blob/master/assets/examples/notebook_render.png)
 
 ## Gyms
-### 1. ```radio-gym-01``` : Cooperative Small Cell Power Switching (Coming soon, V1.0.0)
-- #### Environment
-The environment consists of mobile UEs as pedestrians walk in the old town and multiple small cells.
-The small cells can sense the signal strength and delay of pedestrians where UEs only connect to the cell which provides the
-strongest signal. 
-- #### Reward
-The reward is considered for average connected signal strength of all UEs to cells, the average signal-to-noise (SNR) of UEs 
-between connected cell and disconnected cell, and the consumption transmitting power. 
-- #### Action
-Each cell can control its own transmitting power.
-
-### 2. ```radio-gym-02```: Beamformer by antenna node control (Expected in v1.5)
+### 1. ```radio-gym-01``` : Wireless UAV
+### 2. ```radio-gym-02```: UE Location Prediction
+### 3. ```radio-gym-03```: UE Location Prediction
 
 
 ## Documentation
@@ -205,12 +196,12 @@ Feel free to suggest an environment idea or contribute with us.
 - [x] v0.4.x - Visualization for desktop
 - [x] v0.5.x - Visualization for notebook
 - [x] v0.6.x - Outdoor Simulation
-- [ ] v0.7.0 - Radio Gym 01: Base Station Location Planning
-- [ ] v0.8.0 - Radio Gym 02: UE Location Prediction
-- [ ] v0.9.0 - Radio Gym 03: Cooperative Small Cell Power Control
+- [x] v0.7.x - Radio Gym 01: Wireless UAV Location Control
+- [ ] v0.8.x - Radio Gym 02: UE Location Prediction
+- [ ] v0.9.x - Radio Gym 03: Cooperative Small Cell Power Control
 - [ ] v0.9.5 - Beamforming Engine
-- [ ] v1.0.0 - Radio Gym 04: Intelligent Beamformer
-- [ ] v1.1.0 - FDTD Engine
+- [ ] v1.0.x - Radio Gym 04: Intelligent Beamformer
+- [ ] v1.1.x - FDTD Engine
 
 ## License
 

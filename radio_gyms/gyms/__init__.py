@@ -1,0 +1,1 @@
+from .location_gym import LocationGym
