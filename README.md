@@ -154,18 +154,9 @@ plotter.render_top() # Display from top view
 ![Old Town Simulation's Visualization on a notebook](https://github.com/intelek-ai/radio-gyms/blob/master/assets/examples/notebook_render.png)
 
 ## Gyms
-### 1. ```radio-gym-01``` : Cooperative Small Cell Power Switching (Coming soon, V1.0.0)
-- #### Environment
-The environment consists of mobile UEs as pedestrians walk in the old town and multiple small cells.
-The small cells can sense the signal strength and delay of pedestrians where UEs only connect to the cell which provides the
-strongest signal. 
-- #### Reward
-The reward is considered for average connected signal strength of all UEs to cells, the average signal-to-noise (SNR) of UEs 
-between connected cell and disconnected cell, and the consumption transmitting power. 
-- #### Action
-Each cell can control its own transmitting power.
-
-### 2. ```radio-gym-02```: Beamformer by antenna node control (Expected in v1.5)
+### 1. ```radio-gym-01``` : Wireless UAV
+### 2. ```radio-gym-02```: UE Location Prediction
+### 3. ```radio-gym-03```: UE Location Prediction
 
 
 ## Documentation
