@@ -2,6 +2,7 @@ from kiwisolver import strength
 import numpy as np
 
 from radio_gyms.utils.constants import MAX_FLT, MIN_FLT
+from radio_gyms.utils.converters import mw_to_dbm
 
 from ..utils.notebook import is_notebook
 
@@ -72,6 +73,7 @@ class LocationGym(RadioGym):
             rec_power_list.append(rev_power)
             avg_rev_power += dBmTomW(rev_power)
         avg_rev_power /= len(result)
+        avg_rev_power = mw_to_dbm(avg_rev_power)
         return avg_rev_power, rec_power_list, states
 
     def step(self):
@@ -108,8 +110,13 @@ class LocationGym(RadioGym):
     def get_states(self):
         return self.states
         
-    def get_reward(self):
-        # TODO: [] Calculate reward
-
-        pass
+    def get_reward(self, min_dBm=-120, max_dBm=-40):
+        assert min_dBm < max_dBm
+        avg_rev_power = self.avg_rec
+        avg_rev_power = max(min_dBm, avg_rev_power)
+        avg_rev_power = min(max_dBm, avg_rev_power)
+        power_range = abs(max_dBm-min_dBm)
+        print(avg_rev_power)
+        normalized = (avg_rev_power-min_dBm)/power_range
+        return normalized
 
