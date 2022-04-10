@@ -94,7 +94,7 @@ while True:
     if tracer.is_outdoor(rx_pos):
         break
 result = tracer.trace_outdoor(tx_pos, rx_pos)
-lines = lines + OutdoorResultToLines(result, tx_pos, rx_pos)
+lines = lines + OutdoorResultToLines(result)
 window.line_sets = lines
 window.run()
 ```

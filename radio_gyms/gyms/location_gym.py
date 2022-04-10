@@ -10,7 +10,7 @@ from ..models.theoretical import TheoreticalOutdoorModel
 from .base import RadioGym
 from ..engines import Tracer
 from ..simulations import OldtownWalk
-from ..utils import dBmTomW
+from ..utils import dBmTomW, OutdoorResultToLines
 
 class LocationGym(RadioGym):
     '''
@@ -19,6 +19,7 @@ class LocationGym(RadioGym):
 
     def __init__(self, scene_path: str,  ue_n = 100, generator_seed = 0):
         super().__init__()
+        self.scene_path = scene_path
         self.tracer = Tracer(scene_path, ref_max=1)
         self.simulation = OldtownWalk(self.tracer, 2, ue_n, generator_seed, pre_gen=False)
         self.simulation.pedestrian_position_limit = {
@@ -27,7 +28,7 @@ class LocationGym(RadioGym):
             'min_y': 0.5,
             'max_y': 1.8,
             'min_z': self.tracer.min_bound[2],
-            'max_z': self.tracer.min_bound[2],
+            'max_z': self.tracer.max_bound[2],
         }
         self.simulation.cell_position_limit = {
             'min_x': self.tracer.min_bound[0],
@@ -35,7 +36,7 @@ class LocationGym(RadioGym):
             'min_y': 9,
             'max_y': 9,
             'min_z': self.tracer.min_bound[2],
-            'max_z': self.tracer.min_bound[2],
+            'max_z': self.tracer.max_bound[2],
             'min_tx': 17,
             'max_tx': 17
         }
@@ -45,6 +46,7 @@ class LocationGym(RadioGym):
         self.avg_rec = -1
         self.rec_power_list = []
         self.states = None
+        self.window = None
 
     def update_result(self):
         self.results = self.simulation.get_results()
@@ -85,7 +87,18 @@ class LocationGym(RadioGym):
         if is_notebook():
             print("should plot here")
         else:
-            print("should run window here")
+            if self.window == None:
+                from ..visualizers import Window
+                self.window = Window(title="Radio Gyms 01: wireless UAV")
+                self.window.load_obj_to_scene(self.scene_path)
+            lines = []
+            for result in self.results:
+                line = OutdoorResultToLines(result)
+                lines += line
+            self.window.line_sets = lines
+            self.window.render()
+            self.window.dispatch_events()
+        return
 
     def reset(self):
         self.simulation.cells = []
@@ -116,7 +129,7 @@ class LocationGym(RadioGym):
         avg_rev_power = max(min_dBm, avg_rev_power)
         avg_rev_power = min(max_dBm, avg_rev_power)
         power_range = abs(max_dBm-min_dBm)
-        print(avg_rev_power)
         normalized = (avg_rev_power-min_dBm)/power_range
-        return normalized
+        reward = ((normalized*2)-1)
+        return reward
 
