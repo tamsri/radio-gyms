@@ -1,3 +1,4 @@
+from turtle import position
 import numpy as np
 
 from numpy.typing import NDArray
@@ -23,7 +24,11 @@ class Pedestrian:
             return
         direction = VecNorm(self.destination - self.position)
         step_distance = self.speed * delta_time
-        self.position = self.position + direction * step_distance
-        self.receiver.position = self.position
+        position = self.position + direction * step_distance
+        self.move(position)
         if VecDistance(self.position, self.destination) <= step_distance:
             self.walking = False
+            
+    def move(self, pos):
+        self.position = pos
+        self.receiver.position = pos

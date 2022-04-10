@@ -13,7 +13,9 @@ class OldtownWalk:
     pedestrians: List[Pedestrian] = []
     step: int = 0
 
-    def __init__(self, tracer, cell_n, pedestrian_n, gen_seed=0):
+    def __init__(self, tracer, cell_n, pedestrian_n, gen_seed=0, pre_gen = True):
+        self.cell_n = cell_n
+        self.pedestrian_n = pedestrian_n
         self.step = 0
         self.tracer = tracer
         self.pedestrian_position_limit = {
@@ -36,8 +38,13 @@ class OldtownWalk:
         }
         self.cells, self.pedestrians = [], []
         self.rand_gen = np.random.default_rng(gen_seed)
-        self.generate_cell_randomly(cell_n)
-        self.generate_pedestrian_randomly(pedestrian_n)
+        if pre_gen:
+            self.generate_equipment()
+       
+
+    def generate_equipment(self):
+        self.generate_cell_randomly(self.cell_n)
+        self.generate_pedestrian_randomly(self.pedestrian_n)
 
     def generate_cell_randomly(self, cell_n):
         for i in range(cell_n):

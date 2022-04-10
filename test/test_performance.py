@@ -7,8 +7,7 @@ from radio_gyms.utils.constants import MAX_FLT
 POZNAN_SCENE_PATH = os.path.join(os.getcwd(), "assets", "models", "poznan.obj")
 
 class TestPerformance(TestCase):
-    def test_tracer(self):
-       
+    def test_intersection(self):
         tracer = Tracer(POZNAN_SCENE_PATH)
         tx_pos = [0, 20, 0]
         rx_pos = [-30, 1.5, 45]
@@ -27,3 +26,6 @@ class TestPerformance(TestCase):
         optimize_end = time()
         print(f'brute force tracing {nearest_hit_bf:0.2f}, {(brute_force_end - brute_force_start)*1000:.2f} ms')
         print(f'optimized tracing {nearest_hit_op:0.2f}, {(optimize_end - optimize_start)*1000:.2f} ms')
+
+    def test_diff_scanning(self):
+        pass
