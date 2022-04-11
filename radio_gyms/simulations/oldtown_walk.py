@@ -49,7 +49,7 @@ class OldtownWalk:
     def generate_cell_randomly(self, cell_n):
         for i in range(cell_n):
             position = self.random_outdoor_position(self.cell_position_limit)
-            tx_power = np.random.uniform(low=self.cell_position_limit['min_tx'],
+            tx_power = self.rand_gen.uniform(low=self.cell_position_limit['min_tx'],
                                          high=self.cell_position_limit['max_tx'], size=1)[0]
             cell = Cell(position, tx_power)
             self.cells.append(cell)

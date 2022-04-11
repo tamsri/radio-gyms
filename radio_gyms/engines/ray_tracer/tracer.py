@@ -240,6 +240,7 @@ class Tracer:
         return edge_pos
 
     def is_outdoor(self, pos):
+        pos = np.array(pos)
         sky_pos = np.copy(pos)
         sky_pos[1] = 1000
         return self.direct_path(pos, sky_pos)
