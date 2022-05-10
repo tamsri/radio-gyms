@@ -178,12 +178,15 @@ The pre-released source code can be cited with the following bibtex entry.
 
 ## Contributors
 - [Supawat Tamsri](https://github.com/tamsri), supawat@intelek.ai
-  - Founds and develops.
+  - Builds and implements.
 - [Muhammad Aamir Khan](https://scholar.google.com/citations?user=Q7YdzQEAAAAJ), aamir@intelek.ai
-  - Supervises on machine learning research and AI environments.
-- [Prof. Eng. Krzysztof Cichoń](https://scholar.google.com/citations?user=GmzK3-oAAAAJ), krzysztof.cichon@put.poznan.pl
-  - Supervises on radio propagation and channel modelling features.
-  - Validates and verifies theoretical models and simulated results.
+  - Supervises on ML research and AI.
+
+## Disclaimer
+ Radio gyms is the implementation from WCSim which is a part of the engineering thesis ["Deep Reinforcement Learning for 5G Base Station Planning"](https://www.academia.edu/75221445/Deep_Reinforcement_Learning_in_5G_Base_Station_Planning_with_3D_Ray_Tracing_Engine) by Supawat Tamsri. 
+ 
+ WCSim and Radio Gyms were significantly advised and supported by [Prof. Krzysztof Cichoń](https://scholar.google.com/citations?user=GmzK3-oAAAAJ).
+
 
 ## Community 
 Feel free to suggest an environment idea or contribute with us.
