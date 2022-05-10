@@ -12,7 +12,6 @@ POZNAN_OBJ_PATH = os.path.join(os.getcwd(), "assets", "models", "poznan.obj")
 class TestVirtualizer(TestCase):
 
     def test_result_display(self):
-        return
         window = Window()
         tracer = Tracer(POZNAN_OBJ_PATH)
         tx_pos = np.array([0, 5, 0])
@@ -24,7 +23,7 @@ class TestVirtualizer(TestCase):
                 if tracer.is_outdoor(rx_pos):
                     break
             result = tracer.trace_outdoor(tx_pos, rx_pos)
-            lines = lines + OutdoorResultToLines(result, tx_pos, rx_pos)
+            lines = lines + OutdoorResultToLines(result)
         window.line_sets = lines
         window.load_obj_to_scene(POZNAN_OBJ_PATH)
         window.run()
@@ -51,5 +50,5 @@ class TestVirtualizer(TestCase):
         simulation = OldtownWalk(tracer, 1, 10)
         results = simulation.get_results()
         for result in results:
-            window.line_sets += OutdoorResultToLines(result, result['tx_pos'], result['rx_pos'])
+            window.line_sets += OutdoorResultToLines(result)
         window.run()
